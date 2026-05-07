@@ -41,6 +41,45 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
   UNIQUE(identifier, token)
 );
 
+-- Enable Row Level Security on all Auth.js adapter tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verification_tokens ENABLE ROW LEVEL SECURITY;
+
+-- Users: can read own record, can insert/update own record
+CREATE POLICY "Users can read own record"
+  ON users FOR SELECT
+  USING (id = auth.uid());
+
+CREATE POLICY "Users can insert own record"
+  ON users FOR INSERT
+  WITH CHECK (id = auth.uid());
+
+CREATE POLICY "Users can update own record"
+  ON users FOR UPDATE
+  USING (id = auth.uid());
+
+-- Accounts: users can read their own linked accounts
+CREATE POLICY "Users can read own accounts"
+  ON accounts FOR SELECT
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users can insert own accounts"
+  ON accounts FOR INSERT
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Users can delete own accounts"
+  ON accounts FOR DELETE
+  USING (user_id = auth.uid());
+
+-- Sessions: users can read their own sessions only
+CREATE POLICY "Users can read own sessions"
+  ON sessions FOR SELECT
+  USING (user_id = auth.uid());
+
+-- Verification tokens: no public access (service role only)
+
 -- Fix the foreign key on games table to point to public.users instead of auth.users
 -- (Skip this if you haven't run the main schema yet - just update schema.sql directly)
 ALTER TABLE games DROP CONSTRAINT IF EXISTS games_user_id_fkey;
