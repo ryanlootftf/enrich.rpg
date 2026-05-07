@@ -2,9 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import NavBar from "@/components/NavBar";
 import { Game } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const COLOR_ICONS: Record<string, string> = {
   purple: "🎮",
@@ -25,6 +26,16 @@ export default function HomePage() {
   const [newColor, setNewColor] = useState<string>("purple");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const supabaseRef = useRef<SupabaseClient | null>(null);
+
+  function getSupabase(): SupabaseClient {
+    if (!supabaseRef.current) {
+      // Dynamic import so Supabase client init doesn't break prerendering
+      const mod = require("@/lib/supabase/client") as typeof import("@/lib/supabase/client");
+      supabaseRef.current = mod.createClient();
+    }
+    return supabaseRef.current!;
+  }
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -34,11 +45,6 @@ export default function HomePage() {
       loadGames();
     }
   }, [status, session]);
-
-  function getSupabase() {
-    const { createClient } = require("@/lib/supabase/client");
-    return createClient();
-  }
 
   async function loadGames() {
     const { data } = await getSupabase()
