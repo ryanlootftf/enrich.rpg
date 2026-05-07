@@ -10,7 +10,7 @@ export default function BonusTrackPage() {
   return (
     <div className="space-y-8 pb-16">
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/dashboard")}
         className="text-text-tertiary text-xs hover:text-text-primary transition-colors flex items-center gap-1"
       >
         ← Back to all quests

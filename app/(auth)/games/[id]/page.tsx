@@ -53,7 +53,7 @@ export default function GameDetailPage() {
           This quest doesn't exist or may have been removed.
         </p>
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/dashboard")}
           className="mt-2 bg-accent text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-accent-2 transition-colors"
         >
           Back to Quests
@@ -81,7 +81,7 @@ export default function GameDetailPage() {
     <div className="space-y-10 pb-16">
       {/* Back link */}
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/dashboard")}
         className="text-text-tertiary text-xs hover:text-text-primary transition-colors flex items-center gap-1"
       >
         ← Back to all quests

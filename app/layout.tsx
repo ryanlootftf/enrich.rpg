@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { NavBar } from "@/components/layout/nav-bar";
 
 export const metadata: Metadata = {
   title: "Enrich.rpg — Gamify Your Growth",
@@ -14,12 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <NavBar />
-        <main className="max-w-[900px] mx-auto px-4 pt-6 pb-12">
-          {children}
-        </main>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

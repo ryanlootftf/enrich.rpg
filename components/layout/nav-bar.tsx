@@ -1,20 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export function NavBar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+    getUser();
+  }, [supabase]);
 
   const tabs = [
-    { label: "Games", href: "/" },
+    { label: "Games", href: "/dashboard" },
     { label: "Progress", href: "/progress" },
     { label: "Rewards", href: "/rewards" },
   ];
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
+  const initials = user
+    ? (user.user_metadata?.full_name ?? user.email ?? "??")
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "??";
+
   return (
     <nav className="bg-bg-2 border-b border-border-subtle px-6 flex items-center justify-between h-14 sticky top-0 z-[100]">
-      <Link href="/" className="no-underline">
+      <Link href="/dashboard" className="no-underline">
         <span className="font-syne text-lg font-extrabold tracking-tight gradient-text">
           Enrich.rpg
         </span>
@@ -23,8 +51,8 @@ export function NavBar() {
       <div className="flex gap-1">
         {tabs.map((tab) => {
           const isActive =
-            tab.href === "/"
-              ? pathname === "/" || pathname.startsWith("/games")
+            tab.href === "/dashboard"
+              ? pathname === "/dashboard" || pathname.startsWith("/games")
               : pathname.startsWith(tab.href);
 
           return (
@@ -43,8 +71,19 @@ export function NavBar() {
         })}
       </div>
 
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-teal flex items-center justify-center text-xs font-syne font-bold">
-        AJ
+      <div className="flex items-center gap-3">
+        <div
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-teal flex items-center justify-center text-xs font-syne font-bold cursor-default"
+          title={user?.email ?? ""}
+        >
+          {initials}
+        </div>
+        <button
+          onClick={handleSignOut}
+          className="text-text-tertiary text-[11px] hover:text-text-primary transition-colors"
+        >
+          Sign out
+        </button>
       </div>
     </nav>
   );
