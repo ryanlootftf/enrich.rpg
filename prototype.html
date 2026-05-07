@@ -1,0 +1,1035 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13151c;
+    --bg3: #1a1d27;
+    --bg4: #222636;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f8;
+    --text2: #9497b0;
+    --text3: #5f627a;
+    --accent: #7c6aff;
+    --accent2: #a08bff;
+    --gold: #f4c430;
+    --gold2: #fad76a;
+    --teal: #2dd4bf;
+    --coral: #f97060;
+    --green: #4ade80;
+  }
+
+  body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  .screen { margin-bottom: 40px; }
+
+  /* NAV */
+  .nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    margin-bottom: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .nav-tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-tab.active {
+    background: rgba(124,106,255,0.15);
+    color: var(--accent2);
+    font-weight: 500;
+  }
+  .nav-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  /* ====== HOME SCREEN ====== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .game-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .game-card.purple::before { background: linear-gradient(90deg, #7c6aff, #a08bff); }
+  .game-card.teal::before { background: linear-gradient(90deg, #2dd4bf, #34d399); }
+  .game-card.coral::before { background: linear-gradient(90deg, #f97060, #fb923c); }
+  .game-card.gold::before { background: linear-gradient(90deg, #f4c430, #fbbf24); }
+
+  .game-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .game-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .game-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .game-icon.purple { background: rgba(124,106,255,0.15); }
+  .game-icon.teal { background: rgba(45,212,191,0.12); }
+  .game-icon.coral { background: rgba(249,112,96,0.12); }
+  .game-icon.gold { background: rgba(244,196,48,0.12); }
+
+  .game-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .game-pct span { font-size: 12px; color: var(--text3); font-weight: 400; font-family: 'DM Sans', sans-serif; }
+
+  .game-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .game-desc {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  .mini-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .mini-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+  .mini-bar-fill.purple { background: linear-gradient(90deg, #7c6aff, #a08bff); }
+  .mini-bar-fill.teal { background: linear-gradient(90deg, #2dd4bf, #34d399); }
+  .mini-bar-fill.coral { background: linear-gradient(90deg, #f97060, #fb923c); }
+  .mini-bar-fill.gold { background: linear-gradient(90deg, #f4c430, #fbbf24); }
+
+  .game-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .star-count {
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .star-dot { color: var(--gold); font-size: 10px; }
+  .badge-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .badge-pill.active { background: rgba(74,222,128,0.12); color: var(--green); }
+  .badge-pill.bonus { background: rgba(244,196,48,0.12); color: var(--gold2); }
+
+  .new-game-card {
+    background: transparent;
+    border: 1.5px dashed var(--border2);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 160px;
+    transition: border-color 0.2s;
+  }
+  .new-game-card:hover { border-color: var(--accent); }
+  .new-game-plus {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(124,106,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: var(--accent2);
+  }
+  .new-game-label { font-size: 13px; color: var(--text3); }
+
+  /* ====== GAME DASHBOARD ====== */
+  .dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .dash-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .dash-sub { font-size: 13px; color: var(--text3); }
+
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-ghost {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-value.gold { color: var(--gold); }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .progress-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .progress-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-title { font-size: 13px; font-weight: 500; color: var(--text2); }
+  .progress-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--bg4);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #7c6aff, #a08bff, #c4b5fd);
+    position: relative;
+  }
+  .milestone-row {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 4px;
+  }
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .milestone-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bg4);
+    border: 1.5px solid var(--border2);
+  }
+  .milestone-dot.done { background: var(--accent); border-color: var(--accent); }
+  .milestone-dot.next { background: transparent; border-color: var(--accent2); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Achievements list */
+  .achieve-list { display: flex; flex-direction: column; gap: 8px; }
+  .achieve-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .achieve-item:hover { border-color: var(--border2); }
+  .achieve-item.done { opacity: 0.6; }
+  .achieve-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+  }
+  .achieve-check.done {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .achieve-info { flex: 1; }
+  .achieve-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .achieve-name.done { text-decoration: line-through; color: var(--text3); }
+  .achieve-diff {
+    font-size: 10px;
+    margin-top: 2px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .diff-easy { color: var(--green); }
+  .diff-medium { color: var(--gold2); }
+  .diff-hard { color: var(--coral); }
+  .achieve-stars {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Reward track */
+  .reward-track {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reward-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .reward-item.claimed { opacity: 0.5; }
+  .reward-item.next { border-color: rgba(124,106,255,0.4); background: rgba(124,106,255,0.05); }
+  .reward-item.bonus { border-color: rgba(244,196,48,0.3); background: rgba(244,196,48,0.05); }
+
+  .reward-star-badge {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .reward-info { flex: 1; }
+  .reward-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .reward-req { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .reward-status {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .status-claimed { background: rgba(74,222,128,0.1); color: var(--green); }
+  .status-next { background: rgba(124,106,255,0.15); color: var(--accent2); }
+  .status-locked { background: var(--bg4); color: var(--text3); }
+  .status-bonus { background: rgba(244,196,48,0.12); color: var(--gold2); }
+
+  /* AI modal */
+  .ai-modal-wrap {
+    background: rgba(0,0,0,0.6);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 340px;
+    margin-bottom: 14px;
+  }
+  .ai-modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 18px;
+    padding: 28px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .ai-modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .ai-modal-sub { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+
+  .ai-input-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ai-input-wrap input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    flex: 1;
+  }
+  .ai-input-wrap input::placeholder { color: var(--text3); }
+  .ai-gen-btn {
+    background: linear-gradient(135deg, var(--accent), #9c88ff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .ai-results { display: flex; flex-direction: column; gap: 6px; }
+  .ai-result-group { margin-bottom: 10px; }
+  .ai-result-group-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    margin-bottom: 6px;
+    padding-left: 2px;
+  }
+  .ai-result-group-label.easy { color: var(--green); }
+  .ai-result-group-label.medium { color: var(--gold2); }
+  .ai-result-group-label.hard { color: var(--coral); }
+
+  .ai-achieve-row {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .ai-achieve-check {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--accent2);
+    background: rgba(124,106,255,0.15);
+    flex-shrink: 0;
+  }
+  .ai-achieve-check.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 10px;
+  }
+
+  .add-selected-btn {
+    background: linear-gradient(135deg, var(--accent), #9c88ff);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 14px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* divider label */
+  .divider-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0 16px;
+    color: var(--text3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .divider-label::before, .divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Bonus track */
+  .bonus-banner {
+    background: linear-gradient(135deg, rgba(244,196,48,0.08), rgba(251,191,36,0.03));
+    border: 1px solid rgba(244,196,48,0.2);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .bonus-icon { font-size: 28px; }
+  .bonus-info { flex: 1; }
+  .bonus-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold2);
+    margin-bottom: 3px;
+  }
+  .bonus-sub { font-size: 12px; color: var(--text3); }
+  .bonus-progress-mini {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: right;
+  }
+  .bonus-progress-mini span { font-size: 12px; color: var(--text3); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+
+  .screen-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text2);
+  }
+  .screen-title-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    cursor: pointer;
+    background: var(--bg2);
+  }
+  .chip.active {
+    background: rgba(124,106,255,0.15);
+    border-color: rgba(124,106,255,0.4);
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .home-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-logo">Questify</div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Games</div>
+      <div class="nav-tab">Progress</div>
+      <div class="nav-tab">Rewards</div>
+    </div>
+    <div class="nav-avatar">AJ</div>
+  </div>
+
+  <!-- ======= SCREEN 1: HOME ======= -->
+  <div class="screen">
+    <div class="section-label">Screen 1 — Home</div>
+
+    <div class="home-grid">
+
+      <div class="game-card purple">
+        <div class="game-card-top">
+          <div class="game-icon purple">🗣️</div>
+          <div class="game-pct">42<span>%</span></div>
+        </div>
+        <div class="game-title">Social Confidence Arc</div>
+        <div class="game-desc">Build social skills, one interaction at a time</div>
+        <div class="mini-bar"><div class="mini-bar-fill purple" style="width:42%"></div></div>
+        <div class="game-meta">
+          <div class="star-count"><span class="star-dot">★</span> 42 / 100 stars</div>
+          <div class="badge-pill active">Active</div>
+        </div>
+      </div>
+
+      <div class="game-card teal">
+        <div class="game-card-top">
+          <div class="game-icon teal">🏃</div>
+          <div class="game-pct">78<span>%</span></div>
+        </div>
+        <div class="game-title">Fitness Arc</div>
+        <div class="game-desc">Train your body, earn your rewards</div>
+        <div class="mini-bar"><div class="mini-bar-fill teal" style="width:78%"></div></div>
+        <div class="game-meta">
+          <div class="star-count"><span class="star-dot">★</span> 94 / 120 stars</div>
+          <div class="badge-pill active">Active</div>
+        </div>
+      </div>
+
+      <div class="game-card coral">
+        <div class="game-card-top">
+          <div class="game-icon coral">📚</div>
+          <div class="game-pct">15<span>%</span></div>
+        </div>
+        <div class="game-title">Study Grind</div>
+        <div class="game-desc">Crush your learning goals, one session at a time</div>
+        <div class="mini-bar"><div class="mini-bar-fill coral" style="width:15%"></div></div>
+        <div class="game-meta">
+          <div class="star-count"><span class="star-dot">★</span> 12 / 80 stars</div>
+          <div class="badge-pill active">Active</div>
+        </div>
+      </div>
+
+      <div class="game-card gold">
+        <div class="game-card-top">
+          <div class="game-icon gold">💼</div>
+          <div class="game-pct">∞</div>
+        </div>
+        <div class="game-title">Job Hunt</div>
+        <div class="game-desc">Land your dream role, achievement by achievement</div>
+        <div class="mini-bar"><div class="mini-bar-fill gold" style="width:100%"></div></div>
+        <div class="game-meta">
+          <div class="star-count"><span class="star-dot">★</span> 145 / 120 stars</div>
+          <div class="badge-pill bonus">Bonus Track ✦</div>
+        </div>
+      </div>
+
+      <div class="new-game-card">
+        <div class="new-game-plus">+</div>
+        <div class="new-game-label">Create new game</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======= SCREEN 2: GAME DASHBOARD ======= -->
+  <div class="screen">
+    <div class="section-label">Screen 2 — Game Dashboard</div>
+
+    <div class="screen-title-bar">
+      <div class="back-btn">←</div>
+      <div class="screen-title-text">Social Confidence Arc</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Lifetime Stars</div>
+        <div class="stat-value gold">42 ★</div>
+        <div class="stat-sub">of 100 total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">7</div>
+        <div class="stat-sub">achievements</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Next Reward</div>
+        <div class="stat-value" style="font-size:16px; padding-top:4px;">8 stars</div>
+        <div class="stat-sub">away ✦</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Progress</div>
+        <div class="stat-value" style="color: var(--accent2);">42%</div>
+        <div class="stat-sub">main track</div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-label-row">
+        <div class="progress-title">Reward Track Progress</div>
+        <div class="progress-pct">42 / 100 ★</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: 42%"></div>
+      </div>
+      <div class="milestone-row">
+        <div class="milestone"><div class="milestone-dot done"></div>10★</div>
+        <div class="milestone"><div class="milestone-dot done"></div>25★</div>
+        <div class="milestone"><div class="milestone-dot done"></div>40★</div>
+        <div class="milestone"><div class="milestone-dot next"></div>50★</div>
+        <div class="milestone"><div class="milestone-dot"></div>80★</div>
+        <div class="milestone"><div class="milestone-dot"></div>100★</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Achievements -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:14px; font-weight:500; color:var(--text);">Achievements</div>
+          <button class="btn" style="padding: 6px 12px; font-size:12px;">+ Add</button>
+        </div>
+        <div class="achieve-list">
+          <div class="achieve-item done">
+            <div class="achieve-check done">✓</div>
+            <div class="achieve-info">
+              <div class="achieve-name done">Say hi to a stranger</div>
+              <div class="achieve-diff diff-easy">Easy</div>
+            </div>
+            <div class="achieve-stars">+5 ★</div>
+          </div>
+          <div class="achieve-item done">
+            <div class="achieve-check done">✓</div>
+            <div class="achieve-info">
+              <div class="achieve-name done">Talk to cashier</div>
+              <div class="achieve-diff diff-easy">Easy</div>
+            </div>
+            <div class="achieve-stars">+5 ★</div>
+          </div>
+          <div class="achieve-item">
+            <div class="achieve-check"></div>
+            <div class="achieve-info">
+              <div class="achieve-name">Start a small conversation</div>
+              <div class="achieve-diff diff-medium">Medium</div>
+            </div>
+            <div class="achieve-stars">+12 ★</div>
+          </div>
+          <div class="achieve-item">
+            <div class="achieve-check"></div>
+            <div class="achieve-info">
+              <div class="achieve-name">Join a voice call</div>
+              <div class="achieve-diff diff-medium">Medium</div>
+            </div>
+            <div class="achieve-stars">+12 ★</div>
+          </div>
+          <div class="achieve-item">
+            <div class="achieve-check"></div>
+            <div class="achieve-info">
+              <div class="achieve-name">Attend a local meetup</div>
+              <div class="achieve-diff diff-hard">Hard</div>
+            </div>
+            <div class="achieve-stars">+25 ★</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rewards -->
+      <div>
+        <div style="font-size:14px; font-weight:500; color:var(--text); margin-bottom:12px;">Reward Track</div>
+        <div class="reward-track">
+          <div class="reward-item claimed">
+            <div class="reward-star-badge">☕</div>
+            <div class="reward-info">
+              <div class="reward-name">Favorite drink</div>
+              <div class="reward-req">at 10 stars</div>
+            </div>
+            <div class="reward-status status-claimed">Claimed</div>
+          </div>
+          <div class="reward-item claimed">
+            <div class="reward-star-badge">🍰</div>
+            <div class="reward-info">
+              <div class="reward-name">Fancy dessert</div>
+              <div class="reward-req">at 25 stars</div>
+            </div>
+            <div class="reward-status status-claimed">Claimed</div>
+          </div>
+          <div class="reward-item next">
+            <div class="reward-star-badge" style="border-color: rgba(124,106,255,0.4);">🎮</div>
+            <div class="reward-info">
+              <div class="reward-name">Gaming night</div>
+              <div class="reward-req">at 50 stars — 8 away</div>
+            </div>
+            <div class="reward-status status-next">Next up</div>
+          </div>
+          <div class="reward-item">
+            <div class="reward-star-badge">🛍️</div>
+            <div class="reward-info">
+              <div class="reward-name">Buy something nice</div>
+              <div class="reward-req">at 80 stars</div>
+            </div>
+            <div class="reward-status status-locked">Locked</div>
+          </div>
+          <div class="reward-item">
+            <div class="reward-star-badge" style="font-size:18px;">🏆</div>
+            <div class="reward-info">
+              <div class="reward-name">New mechanical keyboard</div>
+              <div class="reward-req">at 100 stars — final reward</div>
+            </div>
+            <div class="reward-status status-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= SCREEN 3: AI ACHIEVEMENT GENERATOR ======= -->
+  <div class="screen">
+    <div class="section-label">Screen 3 — AI Achievement Generator</div>
+
+    <div class="ai-modal-wrap">
+      <div class="ai-modal">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#9c88ff);display:flex;align-items:center;justify-content:center;font-size:16px;">✦</div>
+          <div class="ai-modal-title">Generate Achievements</div>
+        </div>
+        <div class="ai-modal-sub">Describe your goal and AI will create personalized achievements for you</div>
+
+        <div class="ai-input-wrap">
+          <i class="ti ti-sparkles" style="color:var(--accent2);font-size:16px;" aria-hidden="true"></i>
+          <input type="text" placeholder="e.g. I want to become more social…" value="I want to become more social" />
+          <div class="ai-gen-btn">Generate ✦</div>
+        </div>
+
+        <div class="chip-row">
+          <div class="chip active">All difficulties</div>
+          <div class="chip">Easy only</div>
+          <div class="chip">Balanced</div>
+          <div class="chip">Challenge me</div>
+        </div>
+
+        <div class="ai-results">
+          <div class="ai-result-group">
+            <div class="ai-result-group-label easy">Easy</div>
+            <div class="ai-achieve-row">
+              <span>Say hi to a stranger</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text3);">+5 ★</span>
+                <div class="ai-achieve-check checked">✓</div>
+              </div>
+            </div>
+            <div class="ai-achieve-row">
+              <span>Compliment someone today</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text3);">+5 ★</span>
+                <div class="ai-achieve-check checked">✓</div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-result-group">
+            <div class="ai-result-group-label medium">Medium</div>
+            <div class="ai-achieve-row">
+              <span>Start a 5-min conversation</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text3);">+12 ★</span>
+                <div class="ai-achieve-check checked">✓</div>
+              </div>
+            </div>
+            <div class="ai-achieve-row">
+              <span>Join an online voice call</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text3);">+12 ★</span>
+                <div class="ai-achieve-check"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-result-group">
+            <div class="ai-result-group-label hard">Hard</div>
+            <div class="ai-achieve-row">
+              <span>Attend a local meetup event</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text3);">+25 ★</span>
+                <div class="ai-achieve-check checked">✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="add-selected-btn">Add 4 selected achievements →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= SCREEN 4: BONUS TRACK ======= -->
+  <div class="screen">
+    <div class="section-label">Screen 4 — Infinite Bonus Track</div>
+
+    <div class="bonus-banner">
+      <div class="bonus-icon">✦</div>
+      <div class="bonus-info">
+        <div class="bonus-title">Infinite Bonus Track Unlocked!</div>
+        <div class="bonus-sub">You've completed the main reward track. Keep earning for bonus rewards every 25 stars.</div>
+      </div>
+      <div>
+        <div class="bonus-progress-mini">18<span>/25 ★</span></div>
+        <div style="font-size:10px;color:var(--text3);text-align:right;margin-top:2px;">to next bonus</div>
+      </div>
+    </div>
+
+    <div class="reward-track">
+      <div class="reward-item bonus">
+        <div class="reward-star-badge" style="border-color:rgba(244,196,48,0.3);">🍿</div>
+        <div class="reward-info">
+          <div class="reward-name">Movie night</div>
+          <div class="reward-req">Bonus reward — every 25 stars</div>
+        </div>
+        <div class="reward-status status-bonus">✦ Bonus</div>
+      </div>
+      <div class="reward-item bonus">
+        <div class="reward-star-badge" style="border-color:rgba(244,196,48,0.3);">☕</div>
+        <div class="reward-info">
+          <div class="reward-name">Nice coffee</div>
+          <div class="reward-req">Bonus reward — every 25 stars</div>
+        </div>
+        <div class="reward-status status-bonus">✦ Bonus</div>
+      </div>
+      <div class="reward-item bonus" style="opacity:0.4;">
+        <div class="reward-star-badge">🎮</div>
+        <div class="reward-info">
+          <div class="reward-name">Gaming session</div>
+          <div class="reward-req">7 more stars needed</div>
+        </div>
+        <div class="reward-status status-locked">Locked</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 20px;">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Bonus track progress</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;height:6px;background:var(--bg4);border-radius:99px;overflow:hidden;">
+          <div style="width:72%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;"></div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--gold);">18 / 25 ★</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.game-card').forEach(card => {
+    card.addEventListener('click', () => {
+      sendPrompt('Show me the game dashboard for this game');
+    });
+  });
+  document.querySelector('.new-game-card').addEventListener('click', () => {
+    sendPrompt('Help me create a new game');
+  });
+  document.querySelector('.ai-gen-btn').addEventListener('click', () => {
+    sendPrompt('Generate achievements for becoming more social');
+  });
+  document.querySelector('.add-selected-btn').addEventListener('click', () => {
+    sendPrompt('Add the selected AI-generated achievements to my Social Confidence game');
+  });
+</script>

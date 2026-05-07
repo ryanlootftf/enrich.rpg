@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+@layer base {
+  body {
+    @apply bg-bg text-text-primary font-dm-sans;
+  }
+}
+
+@layer components {
+  .section-label {
+    @apply font-syne text-[11px] tracking-[0.18em] uppercase text-text-tertiary mb-3 pl-0.5;
+  }
+
+  .screen {
+    @apply mb-10;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #a08bff, #f4c430);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .divider-label {
+    @apply flex items-center gap-3 my-8 text-text-tertiary text-[11px] uppercase tracking-[0.15em];
+  }
+  .divider-label::before,
+  .divider-label::after {
+    content: '';
+    @apply flex-1 h-px;
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
