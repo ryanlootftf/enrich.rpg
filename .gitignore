@@ -43,6 +43,9 @@ enrich-app/.env*
 # vercel
 enrich-app/.vercel
 
+# personal reference
+simple.md
+
 # typescript
 enrich-app/*.tsbuildinfo
-enrich-app/next-env.d.tsCOMMIT_MSG.txt  
+enrich-app/next-env.d.ts
