@@ -38,3 +38,8 @@ next-env.d.ts
 
 # turbo
 .turbo
+
+# design docs & database scripts (local only)
+design_docs.md
+prototype.html
+/database
