@@ -45,4 +45,4 @@ enrich-app/.vercel
 
 # typescript
 enrich-app/*.tsbuildinfo
-enrich-app/next-env.d.ts
+enrich-app/next-env.d.tsCOMMIT_MSG.txt  

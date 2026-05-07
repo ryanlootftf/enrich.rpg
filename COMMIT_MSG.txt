@@ -1,1 +1,0 @@
-Fix: rename middleware export to proxy for Next.js 16  
