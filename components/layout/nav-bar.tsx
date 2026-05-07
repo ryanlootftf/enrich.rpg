@@ -16,7 +16,7 @@ export function NavBar() {
     <nav className="bg-bg-2 border-b border-border-subtle px-6 flex items-center justify-between h-14 sticky top-0 z-[100]">
       <Link href="/" className="no-underline">
         <span className="font-syne text-lg font-extrabold tracking-tight gradient-text">
-          Questify
+          Enrich.rpg
         </span>
       </Link>
 

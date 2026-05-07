@@ -3,8 +3,8 @@ import "./globals.css";
 import { NavBar } from "@/components/layout/nav-bar";
 
 export const metadata: Metadata = {
-  title: "Questify — Gamify Your Growth",
-  description: "Turn self-improvement into an epic quest",
+  title: "Enrich.rpg — Gamify Your Growth",
+  description: "Turn self-improvement into an epic RPG quest",
 };
 
 export default function RootLayout({
