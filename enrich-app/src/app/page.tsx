@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
 import { Game } from "@/lib/types";
-import { createClient } from "@/lib/supabase/client";
 
 const COLOR_ICONS: Record<string, string> = {
   purple: "🎮",
@@ -26,7 +25,6 @@ export default function HomePage() {
   const [newColor, setNewColor] = useState<string>("purple");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -37,8 +35,13 @@ export default function HomePage() {
     }
   }, [status, session]);
 
+  function getSupabase() {
+    const { createClient } = require("@/lib/supabase/client");
+    return createClient();
+  }
+
   async function loadGames() {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("games")
       .select("*")
       .order("created_at", { ascending: false });
@@ -50,7 +53,7 @@ export default function HomePage() {
   async function createGame() {
     if (!newTitle.trim() || !session?.user?.id) return;
     setCreating(true);
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("games")
       .insert({
         title: newTitle.trim(),
