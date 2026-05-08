@@ -57,17 +57,19 @@ export function QuestDetailModal({
     achievement.difficulty as Difficulty
   );
 
-  // Local progress (for optimistic updates)
-  const [progressCurrent, setProgressCurrent] = useState(
-    achievement.progressCurrent
-  );
-  const [completed, setCompleted] = useState(achievement.completed);
-
   // Saving state
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
+
+  // Re-sync edit form fields when the achievement prop changes (e.g. after an update)
+  useEffect(() => {
+    setEditTitle(achievement.title);
+    setEditDescription(achievement.description);
+    setEditProgressMax(achievement.progressMax);
+    setEditDifficulty(achievement.difficulty as Difficulty);
+  }, [achievement.title, achievement.description, achievement.progressMax, achievement.difficulty]);
 
   // Focus title input when entering edit mode
   useEffect(() => {
@@ -76,20 +78,21 @@ export function QuestDetailModal({
     }
   }, [editing]);
 
+  const done = achievement.completed;
+  const progressCurrent = achievement.progressCurrent;
   const hasProgress = achievement.progressMax > 0;
   const progressPct = hasProgress
     ? Math.min(Math.round((progressCurrent / achievement.progressMax) * 100), 100)
     : 0;
 
   const handleProgressDelta = async (delta: number) => {
-    // Optimistic update
+    // Optimistic update on the parent
     const newCurrent = Math.max(
       0,
       Math.min(progressCurrent + delta, achievement.progressMax)
     );
-    const newCompleted = hasProgress ? newCurrent >= achievement.progressMax : completed;
-    setProgressCurrent(newCurrent);
-    setCompleted(newCompleted);
+    const newCompleted = hasProgress ? newCurrent >= achievement.progressMax : done;
+    onUpdate({ ...achievement, progressCurrent: newCurrent, completed: newCompleted });
 
     try {
       await updateAchievementProgressBy(achievement.id, gameId, delta);
@@ -99,47 +102,56 @@ export function QuestDetailModal({
         .eq("id", achievement.id)
         .single();
       if (achRow) {
-        const updated: Achievement = {
+        onUpdate({
           ...achievement,
           progressCurrent: achRow.progress_current ?? 0,
           completed: achRow.completed ?? false,
-        };
-        onUpdate(updated);
+        });
       }
     } catch (err) {
-      // Revert
-      setProgressCurrent(achievement.progressCurrent);
-      setCompleted(achievement.completed);
+      // Revert on parent
+      onUpdate({
+        ...achievement,
+        progressCurrent: achievement.progressCurrent,
+        completed: achievement.completed,
+      });
       console.error("Failed to update progress:", err);
     }
   };
 
   const handleToggleComplete = async () => {
-    const newCompleted = !completed;
-    setCompleted(newCompleted);
+    const newCompleted = !done;
+    const newCurrent = newCompleted
+      ? achievement.progressMax
+      : 0;
+
+    // Optimistic update on the parent
+    onUpdate({ ...achievement, progressCurrent: newCurrent, completed: newCompleted });
 
     try {
-      await updateAchievementProgressBy(
-        achievement.id,
-        gameId,
-        newCompleted ? achievement.progressMax - progressCurrent : -progressCurrent
-      );
+      const delta = newCompleted
+        ? achievement.progressMax - progressCurrent
+        : -progressCurrent;
+      await updateAchievementProgressBy(achievement.id, gameId, delta);
       const { data: achRow } = await supabase
         .from("achievements")
         .select("*")
         .eq("id", achievement.id)
         .single();
       if (achRow) {
-        const updated: Achievement = {
+        onUpdate({
           ...achievement,
           progressCurrent: achRow.progress_current ?? 0,
           completed: achRow.completed ?? false,
-        };
-        onUpdate(updated);
-        setProgressCurrent(achRow.progress_current ?? 0);
+        });
       }
     } catch (err) {
-      setCompleted(achievement.completed);
+      // Revert on parent
+      onUpdate({
+        ...achievement,
+        progressCurrent: achievement.progressCurrent,
+        completed: achievement.completed,
+      });
       console.error("Failed to toggle complete:", err);
     }
   };
@@ -175,7 +187,7 @@ export function QuestDetailModal({
           difficulty: editDifficulty as Achievement["difficulty"],
           starsRewarded: achRow.stars_rewarded ?? achievement.starsRewarded,
           progressCurrent: achRow.progress_current ?? progressCurrent,
-          completed: achRow.completed ?? completed,
+          completed: achRow.completed ?? done,
         };
         onUpdate(updated);
       }
@@ -284,7 +296,7 @@ export function QuestDetailModal({
             ) : (
               <div
                 className={`text-[15px] font-syne font-semibold ${
-                  completed ? "text-text-tertiary line-through" : "text-text-primary"
+                  done ? "text-text-tertiary line-through" : "text-text-primary"
                 }`}
               >
                 {achievement.title}
@@ -377,7 +389,7 @@ export function QuestDetailModal({
               <div className="h-2 bg-border-subtle rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full bg-gradient-to-r ${
-                    completed ? "from-green-400 to-emerald-500" : "bg-accent"
+                    done ? "from-green-400 to-emerald-500" : "bg-accent"
                   } transition-[width] duration-300 ease-out`}
                   style={{ width: `${progressPct}%` }}
                 />
@@ -399,7 +411,7 @@ export function QuestDetailModal({
                 <button
                   type="button"
                   onClick={() => handleProgressDelta(1)}
-                  disabled={progressCurrent >= achievement.progressMax || completed}
+                  disabled={progressCurrent >= achievement.progressMax || done}
                   className="w-8 h-8 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-base leading-none disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   +
@@ -458,13 +470,13 @@ export function QuestDetailModal({
             <button
               onClick={handleToggleComplete}
               className={`w-full flex items-center justify-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors ${
-                completed
+                done
                   ? "bg-green text-white hover:bg-green/90"
                   : "bg-accent text-white hover:bg-accent/90"
               }`}
             >
               <span className="text-sm font-bold">✓</span>
-              {completed ? "Mark as incomplete" : "Mark as complete"}
+              {done ? "Mark as incomplete" : "Mark as complete"}
             </button>
           )}
 

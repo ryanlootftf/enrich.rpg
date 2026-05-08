@@ -26,21 +26,10 @@ export function AchievementItem({ achievement, onClick }: Props) {
   return (
     <div
       onClick={() => onClick?.(achievement)}
-      className={`bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3 transition-colors duration-150 hover:border-border-default cursor-pointer ${
+      className={`bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-2.5 transition-colors duration-150 hover:border-border-default cursor-pointer ${
         done ? "opacity-60" : ""
       }`}
     >
-      {/* Checkbox indicator (visual only) */}
-      <div
-        className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center flex-shrink-0 text-[11px] ${
-          done
-            ? "bg-accent border-accent text-white"
-            : "border-border-default"
-        }`}
-      >
-        {done && "✓"}
-      </div>
-
       {/* Title + Description + Progress */}
       <div className="flex-1 min-w-0">
         <div
