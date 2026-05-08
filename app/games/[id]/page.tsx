@@ -434,9 +434,9 @@ export default function GameDetailPage() {
 
         {/* Create form */}
         {showCreateForm && (
-          <div className="mb-4 space-y-3">
-            {/* ── Quest details card ── */}
-            <div className="bg-bg-2 border border-border-subtle rounded-xl p-4 space-y-4">
+          <div className="mb-4 bg-bg-2 border border-border-subtle rounded-xl p-4 space-y-4">
+            {/* ── Quest details ── */}
+            <div className="space-y-4">
               {/* Title */}
               <div>
                 <label className="block text-[11px] font-medium text-text-secondary mb-1">
