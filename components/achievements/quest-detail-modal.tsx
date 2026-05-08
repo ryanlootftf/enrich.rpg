@@ -21,8 +21,8 @@ const diffPills: Record<string, { container: string; dot: string; text: string }
 
 const difficultyStars: Record<string, number> = {
   easy: 1,
-  medium: 2,
-  hard: 3,
+  medium: 3,
+  hard: 5,
 };
 
 const diffConfig = [
