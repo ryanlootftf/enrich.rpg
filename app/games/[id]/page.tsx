@@ -462,7 +462,7 @@ export default function GameDetailPage() {
                 onChange={(e) =>
                   setNewDifficulty(e.target.value as Difficulty)
                 }
-                className="bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
+                className="bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
               >
                 <option value="easy">Easy (1★)</option>
                 <option value="medium">Medium (3★)</option>
