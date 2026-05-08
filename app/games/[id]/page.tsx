@@ -339,54 +339,71 @@ export default function GameDetailPage() {
         </h1>
         <p className="text-text-secondary text-sm mb-5">{game.description}</p>
 
-        {/* Stats row */}
-        <div className="flex gap-6 flex-wrap">
-          <div>
-            <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
-              Stars
-            </span>
-            <div className="text-lg font-syne font-bold text-text-primary">
-              {totalStarsEarned}{" "}
-              <span className="text-text-tertiary text-sm font-normal">
-                / {game.totalPossibleStars}
-              </span>
+        {achievements.length === 0 ? (
+          /* Empty state — no quests yet */
+          <div className="bg-bg-2 border border-dashed border-border-tertiary/40 rounded-2xl p-6 text-center space-y-3">
+            <div className="text-3xl">🧭</div>
+            <div>
+              <p className="text-sm font-syne font-semibold text-text-primary">
+                Ready to start your quest?
+              </p>
+              <p className="text-xs text-text-tertiary mt-1">
+                Add your first quest to begin earning stars and tracking progress.
+              </p>
             </div>
           </div>
-          <div>
-            <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
-              Completed
-            </span>
-            <div className="text-lg font-syne font-bold text-text-primary">
-              {completedCount}{" "}
-              <span className="text-text-tertiary text-sm font-normal">
-                / {achievements.length} quests
-              </span>
-            </div>
-          </div>
-          <div>
-            <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
-              Progress
-            </span>
-            <div className="text-lg font-syne font-bold text-text-primary">
-              {progress}
-              {!game.isBonus && (
-                <span className="text-text-tertiary text-sm font-normal">
-                  %
+        ) : (
+          <>
+            {/* Stats row */}
+            <div className="flex gap-6 flex-wrap">
+              <div>
+                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                  Stars
                 </span>
-              )}
+                <div className="text-lg font-syne font-bold text-text-primary">
+                  {totalStarsEarned}{" "}
+                  <span className="text-text-tertiary text-sm font-normal">
+                    / {game.totalPossibleStars}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                  Completed
+                </span>
+                <div className="text-lg font-syne font-bold text-text-primary">
+                  {completedCount}{" "}
+                  <span className="text-text-tertiary text-sm font-normal">
+                    / {achievements.length} quests
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                  Progress
+                </span>
+                <div className="text-lg font-syne font-bold text-text-primary">
+                  {progress}
+                  {!game.isBonus && (
+                    <span className="text-text-tertiary text-sm font-normal">
+                      %
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Progress bar */}
-        <div className="mt-4 h-2 bg-border-subtle rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full bg-gradient-to-r ${
-              themeGradients[game.theme]
-            } transition-[width] duration-600 ease-out`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+            {/* Progress bar */}
+            <div className="mt-4 h-2 bg-border-subtle rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r ${
+                  themeGradients[game.theme]
+                } transition-[width] duration-600 ease-out`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </>
+        )}
       </section>
 
       {/* Achievements / Quests */}

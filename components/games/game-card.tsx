@@ -29,7 +29,8 @@ const themeIcons: Record<string, string> = {
 export function GameCard({ game }: { game: Game }) {
   const [deleting, setDeleting] = useState(false);
 
-  const progress = Math.round(
+  const isEmpty = game.totalPossibleStars === 0;
+  const progress = isEmpty ? 0 : Math.round(
     (game.lifetimeStars / game.totalPossibleStars) * 100
   );
   const displayPct = game.isBonus ? "∞" : `${progress}`;
@@ -44,7 +45,9 @@ export function GameCard({ game }: { game: Game }) {
 
   return (
     <Link href={`/games/${game.id}`} className="no-underline relative group">
-      <div className="relative overflow-hidden bg-bg-2 border border-border-subtle rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-border-default hover:-translate-y-0.5">
+      <div className={`relative overflow-hidden bg-bg-2 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 ${
+        isEmpty ? "border-dashed border-border-tertiary/40 hover:border-border-default" : "border-border-subtle hover:border-border-default"
+      }`}>
         {/* Top accent bar */}
         <div
           className={`absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl bg-gradient-to-r ${
@@ -87,14 +90,20 @@ export function GameCard({ game }: { game: Game }) {
           >
             {themeIcons[game.theme]}
           </div>
-          <div className="font-syne text-[22px] font-bold text-text-primary">
-            {displayPct}
-            {!game.isBonus && (
-              <span className="text-xs text-text-tertiary font-normal font-dm-sans">
-                %
-              </span>
-            )}
-          </div>
+          {isEmpty ? (
+            <div className="font-syne text-[11px] font-semibold text-text-tertiary flex items-center gap-1 pt-1">
+              <span>✨</span> 0%
+            </div>
+          ) : (
+            <div className="font-syne text-[22px] font-bold text-text-primary">
+              {displayPct}
+              {!game.isBonus && (
+                <span className="text-xs text-text-tertiary font-normal font-dm-sans">
+                  %
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Title + description */}
@@ -117,17 +126,26 @@ export function GameCard({ game }: { game: Game }) {
 
         {/* Bottom row: stars + badge */}
         <div className="flex items-center justify-between mt-[10px]">
-          <div className="text-xs text-text-secondary flex items-center gap-1">
-            <span className="text-gold text-[10px]">★</span>
-            {game.lifetimeStars} / {game.totalPossibleStars} stars
-          </div>
+          {isEmpty ? (
+            <div className="text-xs text-text-tertiary flex items-center gap-1">
+              <span className="text-[10px]">📋</span>
+              Add a quest to get started
+            </div>
+          ) : (
+            <div className="text-xs text-text-secondary flex items-center gap-1">
+              <span className="text-gold text-[10px]">★</span>
+              {game.lifetimeStars} / {game.totalPossibleStars} stars
+            </div>
+          )}
           {game.isBonus ? (
             <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-gold/10 text-gold-2">
               Bonus Track ✦
             </span>
           ) : (
-            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-green/10 text-green">
-              Active
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+              isEmpty ? "bg-text-tertiary/10 text-text-tertiary" : "bg-green/10 text-green"
+            }`}>
+              {isEmpty ? "Empty" : "Active"}
             </span>
           )}
         </div>
