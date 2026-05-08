@@ -119,3 +119,69 @@ export async function updateAchievementProgress(
 
   revalidatePath(`/games/${gameId}`);
 }
+
+export async function updateAchievementProgressBy(
+  id: string,
+  gameId: string,
+  delta: number
+) {
+  const supabase = await createClient();
+
+  // Fetch current state
+  const { data: ach, error: fetchErr } = await supabase
+    .from("achievements")
+    .select("progress_current, progress_max, completed")
+    .eq("id", id)
+    .single();
+
+  if (fetchErr || !ach) throw new Error(fetchErr?.message ?? "Not found");
+
+  const newCurrent = Math.max(0, Math.min((ach.progress_current ?? 0) + delta, ach.progress_max ?? 0));
+  const newCompleted = newCurrent >= (ach.progress_max ?? 0) && (ach.progress_max ?? 0) > 0;
+
+  const { error } = await supabase
+    .from("achievements")
+    .update({
+      progress_current: newCurrent,
+      completed: newCompleted,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}
+
+export async function updateAchievementProgressMax(
+  id: string,
+  gameId: string,
+  progressMax: number
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("achievements")
+    .update({ progress_max: Math.max(0, progressMax) })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}
+
+export async function updateAchievementDifficulty(
+  id: string,
+  gameId: string,
+  difficulty: Difficulty
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("achievements")
+    .update({ difficulty, stars_rewarded: STAR_MAP[difficulty] })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}

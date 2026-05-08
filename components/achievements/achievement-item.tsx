@@ -1,7 +1,6 @@
 "use client";
 
 import type { Achievement } from "@/app/types";
-import { updateAchievementProgress } from "@/app/actions/achievements";
 
 const diffColors: Record<string, string> = {
   easy: "text-green",
@@ -11,10 +10,10 @@ const diffColors: Record<string, string> = {
 
 interface Props {
   achievement: Achievement;
-  onToggle?: (id: string) => void;
+  onClick?: (achievement: Achievement) => void;
 }
 
-export function AchievementItem({ achievement, onToggle }: Props) {
+export function AchievementItem({ achievement, onClick }: Props) {
   const done = achievement.completed;
   const hasProgress = achievement.progressMax > 0;
   const progressPct = hasProgress
@@ -24,29 +23,20 @@ export function AchievementItem({ achievement, onToggle }: Props) {
       )
     : 0;
 
-  const handleIncrement = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await updateAchievementProgress(achievement.id, achievement.gameId);
-    } catch (err) {
-      console.error("Failed to increment progress:", err);
-    }
-  };
-
   return (
     <div
-      className={`bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3 transition-colors duration-150 hover:border-border-default ${
+      onClick={() => onClick?.(achievement)}
+      className={`bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3 transition-colors duration-150 hover:border-border-default cursor-pointer ${
         done ? "opacity-60" : ""
       }`}
     >
-      {/* Checkbox */}
+      {/* Checkbox indicator (visual only) */}
       <div
-        className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center flex-shrink-0 text-[11px] cursor-pointer select-none ${
+        className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center flex-shrink-0 text-[11px] ${
           done
             ? "bg-accent border-accent text-white"
             : "border-border-default"
         }`}
-        onClick={() => onToggle?.(achievement.id)}
       >
         {done && "✓"}
       </div>
@@ -77,13 +67,9 @@ export function AchievementItem({ achievement, onToggle }: Props) {
                 style={{ width: `${progressPct}%` }}
               />
             </div>
-            <button
-              onClick={handleIncrement}
-              className="text-[10px] font-medium text-accent-2 hover:text-accent flex items-center gap-0.5 transition-colors flex-shrink-0"
-              title="Increment progress"
-            >
-              ＋ {achievement.progressCurrent}/{achievement.progressMax}
-            </button>
+            <span className="text-[10px] font-medium text-accent-2 flex items-center gap-0.5 flex-shrink-0">
+              {achievement.progressCurrent}/{achievement.progressMax}
+            </span>
           </div>
         )}
 

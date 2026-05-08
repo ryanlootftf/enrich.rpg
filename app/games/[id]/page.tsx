@@ -12,10 +12,9 @@ import { mockAIResults } from "@/app/mock-data";
 import {
   createAchievement,
   deleteAchievement,
-  updateAchievementTitle,
-  updateAchievementDescription,
   type Difficulty,
 } from "@/app/actions/achievements";
+import { QuestDetailModal } from "@/components/achievements/quest-detail-modal";
 
 const themeGradients: Record<string, string> = {
   purple: "from-[#7c6aff] to-[#a08bff]",
@@ -95,14 +94,11 @@ export default function GameDetailPage() {
   const [newProgressMax, setNewProgressMax] = useState(0);
   const [creating, setCreating] = useState(false);
 
-  // Edit state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
+  // Modal state
+  const [selectedQuest, setSelectedQuest] = useState<Achievement | null>(null);
 
   // Refs for focus management
   const createInputRef = useRef<HTMLInputElement>(null);
-  const editInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch game + achievements + rewards from Supabase
   useEffect(() => {
@@ -158,38 +154,6 @@ export default function GameDetailPage() {
     }
   }, [showCreateForm]);
 
-  useEffect(() => {
-    if (editingId && editInputRef.current) {
-      editInputRef.current.focus();
-    }
-  }, [editingId]);
-
-  const toggleAchievement = async (id: string) => {
-    // Optimistic update
-    const prev = achievements;
-    setAchievements((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, completed: !a.completed } : a))
-    );
-
-    // Find the achievement being toggled
-    const ach = achievements.find((a) => a.id === id);
-    if (!ach) return;
-
-    const newCompleted = !ach.completed;
-
-    // Update in Supabase — the DB trigger handles star counting
-    const { error } = await supabase
-      .from("achievements")
-      .update({ completed: newCompleted })
-      .eq("id", id);
-
-    if (error) {
-      // Revert on error
-      setAchievements(prev);
-      console.error("Failed to toggle achievement:", error.message);
-    }
-  };
-
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
     setCreating(true);
@@ -236,42 +200,20 @@ export default function GameDetailPage() {
     }
   };
 
-  const startEdit = (ach: Achievement) => {
-    setEditingId(ach.id);
-    setEditTitle(ach.title);
-    setEditDescription(ach.description);
+  const handleQuestClick = (ach: Achievement) => {
+    setSelectedQuest(ach);
   };
 
-  const saveEdit = async () => {
-    if (!editingId) return;
-    try {
-      if (editTitle.trim()) {
-        await updateAchievementTitle(editingId, gameId, editTitle.trim());
-      }
-      await updateAchievementDescription(
-        editingId,
-        gameId,
-        editDescription.trim()
-      );
-      setEditingId(null);
-      setEditTitle("");
-      setEditDescription("");
-      // Refetch
-      const { data: achRows } = await supabase
-        .from("achievements")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("created_at", { ascending: true });
-      setAchievements((achRows ?? []).map((r: AchievementRow) => achievementFromRow(r)));
-    } catch (e) {
-      console.error("Failed to update achievement:", e);
-    }
+  const handleQuestUpdate = (updated: Achievement) => {
+    setAchievements((prev) =>
+      prev.map((a) => (a.id === updated.id ? updated : a))
+    );
+    setSelectedQuest(updated);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditTitle("");
-    setEditDescription("");
+  const handleQuestDelete = (id: string) => {
+    setAchievements((prev) => prev.filter((a) => a.id !== id));
+    setSelectedQuest(null);
   };
 
   if (loading) {
@@ -625,70 +567,11 @@ export default function GameDetailPage() {
                 </p>
               ) : (
                 filteredAchievements.map((ach) => (
-                  <div key={ach.id} className="group relative">
-                    {editingId === ach.id ? (
-                      /* Inline edit */
-                      <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 space-y-2">
-                        <div className="flex items-center gap-3">
-                          <input
-                            ref={editInputRef}
-                            type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") saveEdit();
-                              if (e.key === "Escape") cancelEdit();
-                            }}
-                          />
-                          <button
-                            onClick={saveEdit}
-                            className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                        <textarea
-                          value={editDescription}
-                          onChange={(e) => setEditDescription(e.target.value)}
-                          placeholder="Description…"
-                          rows={2}
-                          className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-                        />
-                      </div>
-                    ) : (
-                      /* Normal row with hover actions */
-                      <div className="relative">
-                        <AchievementItem
-                          achievement={ach}
-                          onToggle={toggleAchievement}
-                        />
-                        {/* Hover actions */}
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => startEdit(ach)}
-                            className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-xs"
-                            title="Edit"
-                          >
-                            ✎
-                          </button>
-                          <button
-                            onClick={() => handleDelete(ach.id)}
-                            className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-coral hover:bg-bg-1 transition-colors text-xs"
-                            title="Delete"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <AchievementItem
+                    key={ach.id}
+                    achievement={ach}
+                    onClick={handleQuestClick}
+                  />
                 ))
               )}
             </div>
@@ -727,6 +610,17 @@ export default function GameDetailPage() {
         gameTitle={game.title}
         results={mockAIResults}
       />
+
+      {/* Quest Detail Modal */}
+      {selectedQuest && (
+        <QuestDetailModal
+          achievement={selectedQuest}
+          gameId={gameId}
+          onClose={() => setSelectedQuest(null)}
+          onUpdate={handleQuestUpdate}
+          onDelete={handleQuestDelete}
+        />
+      )}
     </div>
   );
 }
