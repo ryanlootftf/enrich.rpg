@@ -441,20 +441,22 @@ export default function GameDetailPage() {
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Quest title…"
-              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+              className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleCreate();
                 if (e.key === "Escape") setShowCreateForm(false);
               }}
             />
+            <div className="h-px bg-border-subtle" />
             <textarea
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder="Optional description…"
               rows={2}
-              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
+              className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
             />
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="h-px bg-border-subtle" />
+            <div className="flex items-center gap-3 flex-wrap isolate">
               <select
                 value={newDifficulty}
                 onChange={(e) =>
@@ -466,7 +468,7 @@ export default function GameDetailPage() {
                 <option value="medium">Medium (3★)</option>
                 <option value="hard">Hard (5★)</option>
               </select>
-              <label className="flex items-center gap-1.5 text-xs text-text-secondary">
+              <span className="flex items-center gap-1.5 text-xs text-text-secondary">
                 Progress:
                 <button
                   type="button"
@@ -486,7 +488,7 @@ export default function GameDetailPage() {
                   +
                 </button>
                 <span className="text-text-tertiary text-[10px]">steps</span>
-              </label>
+              </span>
               <button
                 onClick={handleCreate}
                 disabled={creating || !newTitle.trim()}
