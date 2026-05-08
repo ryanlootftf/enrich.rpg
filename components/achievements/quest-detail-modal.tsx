@@ -13,16 +13,10 @@ import {
 } from "@/app/actions/achievements";
 import { createClient } from "@/lib/supabase/client";
 
-const diffColors: Record<string, string> = {
-  easy: "text-green",
-  medium: "text-gold-2",
-  hard: "text-coral",
-};
-
-const diffDots: Record<string, string> = {
-  easy: "bg-green",
-  medium: "bg-gold",
-  hard: "bg-coral",
+const diffPills: Record<string, { container: string; dot: string; text: string }> = {
+  easy: { container: "bg-green/10 border-green/30", dot: "bg-green", text: "text-green" },
+  medium: { container: "bg-gold/10 border-gold/30", dot: "bg-gold", text: "text-gold-2" },
+  hard: { container: "bg-coral/10 border-coral/30", dot: "bg-coral", text: "text-coral" },
 };
 
 const difficultyStars: Record<string, number> = {
@@ -207,6 +201,9 @@ export function QuestDetailModal({
     }
   };
 
+  const pill = diffPills[achievement.difficulty] ?? diffPills.easy;
+  const starCount = editing ? difficultyStars[editDifficulty] : achievement.starsRewarded;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -220,24 +217,57 @@ export function QuestDetailModal({
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-bg-2 border border-border-subtle rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-2">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <h3 className="text-base font-syne font-bold text-text-primary">
             Quest Details
           </h3>
-          <button
-            onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-sm"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1.5">
+            {!editing && (
+              <button
+                onClick={() => {
+                  setEditTitle(achievement.title);
+                  setEditDescription(achievement.description);
+                  setEditProgressMax(achievement.progressMax);
+                  setEditDifficulty(achievement.difficulty as Difficulty);
+                  setEditing(true);
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-accent-2 hover:bg-bg-1 transition-colors text-sm"
+                title="Edit quest"
+              >
+                ✎
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-sm"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
+        {/* Header separator */}
+        <hr className="border-t border-border-subtle/50 mx-6" />
+
         {/* Body */}
-        <div className="px-6 py-4 space-y-5">
-          {/* Title */}
+        <div className="px-6 py-5 space-y-5">
+          {/* Difficulty badge (pill) — shown before title */}
+          {!editing && (
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${pill.container}`}>
+              <span className={`w-2 h-2 rounded-full ${pill.dot}`} />
+              <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${pill.text}`}>
+                {achievement.difficulty}
+              </span>
+            </div>
+          )}
+
+          {/* Title (or edit input) */}
           <div>
             {editing ? (
               <>
+                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                  Quest title
+                </span>
                 <input
                   ref={titleInputRef}
                   type="text"
@@ -252,73 +282,49 @@ export function QuestDetailModal({
                 </span>
               </>
             ) : (
-              <>
-                <div
-                  className={`text-[15px] font-syne font-semibold ${
-                    completed ? "text-text-tertiary line-through" : "text-text-primary"
-                  }`}
-                >
-                  {achievement.title}
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    onClick={() => {
-                      setEditTitle(achievement.title);
-                      setEditDescription(achievement.description);
-                      setEditProgressMax(achievement.progressMax);
-                      setEditDifficulty(achievement.difficulty as Difficulty);
-                      setEditing(true);
-                    }}
-                    className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
-                  >
-                    ✎ Edit
-                  </button>
-                </div>
-              </>
+              <div
+                className={`text-[15px] font-syne font-semibold ${
+                  completed ? "text-text-tertiary line-through" : "text-text-primary"
+                }`}
+              >
+                {achievement.title}
+              </div>
             )}
           </div>
 
-          {/* Difficulty */}
-          <div>
-            {editing ? (
-              <div>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
-                  Difficulty
-                </span>
-                <div className="flex gap-2">
-                  {diffConfig.map(({ value, label, dot }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setEditDifficulty(value)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
-                        editDifficulty === value
-                          ? "border-accent bg-accent/10 text-accent-2"
-                          : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
-                      }`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${dot}`} />
-                      {label}
-                    </button>
-                  ))}
-                </div>
+          {/* Difficulty edit buttons (only in edit mode) */}
+          {editing && (
+            <div>
+              <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                Difficulty
+              </span>
+              <div className="flex gap-2">
+                {diffConfig.map(({ value, label, dot }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setEditDifficulty(value)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
+                      editDifficulty === value
+                        ? "border-accent bg-accent/10 text-accent-2"
+                        : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${dot}`} />
+                    {label}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${diffDots[achievement.difficulty]}`} />
-                <span
-                  className={`text-[11px] font-medium uppercase tracking-[0.06em] ${diffColors[achievement.difficulty]}`}
-                >
-                  {achievement.difficulty}
-                </span>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Description */}
           <div>
             {editing ? (
               <>
+                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                  Description
+                </span>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
@@ -337,20 +343,30 @@ export function QuestDetailModal({
                 </span>
               </>
             ) : (
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {achievement.description || (
-                  <span className="text-text-tertiary italic">No description</span>
-                )}
-              </p>
+              <>
+                <span className="block text-[11px] font-medium text-text-secondary mb-1">
+                  Description
+                </span>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  {achievement.description || (
+                    <span className="text-text-tertiary italic">No description</span>
+                  )}
+                </p>
+              </>
             )}
           </div>
 
-          {/* Stars */}
-          <div className="text-xs text-gold font-medium">
-            +{editing ? difficultyStars[editDifficulty] : achievement.starsRewarded} ★
+          {/* Reward section */}
+          <div>
+            <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+              Reward
+            </span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/30 bg-gold/10 text-gold-2 text-xs font-semibold">
+              +{starCount} ★
+            </div>
           </div>
 
-          {/* Progress section */}
+          {/* Progress section (steps indicator) */}
           {hasProgress && (
             <div className="bg-bg-3/50 border border-border-subtle/50 rounded-xl p-4 space-y-3">
               <span className="block text-[11px] font-medium text-text-secondary uppercase tracking-wider">
@@ -437,25 +453,17 @@ export function QuestDetailModal({
             </div>
           )}
 
-          {/* Mark as complete */}
+          {/* Mark as complete — solid filled button */}
           {!editing && (
             <button
               onClick={handleToggleComplete}
-              className={`w-full flex items-center justify-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-colors ${
+              className={`w-full flex items-center justify-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors ${
                 completed
-                  ? "bg-green-400/10 border-green-400/30 text-green-400 hover:bg-green-400/20"
-                  : "bg-accent/10 border-accent/30 text-accent-2 hover:bg-accent/20"
+                  ? "bg-green text-white hover:bg-green/90"
+                  : "bg-accent text-white hover:bg-accent/90"
               }`}
             >
-              <span
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] ${
-                  completed
-                    ? "bg-green-400 border-green-400 text-white"
-                    : "border-accent"
-                }`}
-              >
-                {completed && "✓"}
-              </span>
+              <span className="text-sm font-bold">✓</span>
               {completed ? "Mark as incomplete" : "Mark as complete"}
             </button>
           )}
