@@ -597,99 +597,103 @@ export default function GameDetailPage() {
           </div>
         )}
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-4">
-          {(["all", "easy", "medium", "hard"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`text-[11px] px-3 py-1 rounded-full font-medium capitalize transition-colors ${
-                filter === f
-                  ? "bg-accent/15 text-accent-2"
-                  : "bg-bg-2 border border-border-subtle text-text-tertiary hover:text-text-secondary"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+        {!showCreateForm && (
+          <>
+            {/* Filter tabs */}
+            <div className="flex gap-2 mb-4">
+              {(["all", "easy", "medium", "hard"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`text-[11px] px-3 py-1 rounded-full font-medium capitalize transition-colors ${
+                    filter === f
+                      ? "bg-accent/15 text-accent-2"
+                      : "bg-bg-2 border border-border-subtle text-text-tertiary hover:text-text-secondary"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
 
-        <div className="flex flex-col gap-2">
-          {filteredAchievements.length === 0 ? (
-            <p className="text-text-tertiary text-xs py-6 text-center">
-              {achievements.length === 0
-                ? "No quests yet. Add one with ＋ New Quest or use the AI Coach!"
-                : "No quests for this filter."}
-            </p>
-          ) : (
-            filteredAchievements.map((ach) => (
-              <div key={ach.id} className="group relative">
-                {editingId === ach.id ? (
-                  /* Inline edit */
-                  <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <input
-                        ref={editInputRef}
-                        type="text"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") saveEdit();
-                          if (e.key === "Escape") cancelEdit();
-                        }}
-                      />
-                      <button
-                        onClick={saveEdit}
-                        className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                    <textarea
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      placeholder="Description…"
-                      rows={2}
-                      className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-                    />
+            <div className="flex flex-col gap-2">
+              {filteredAchievements.length === 0 ? (
+                <p className="text-text-tertiary text-xs py-6 text-center">
+                  {achievements.length === 0
+                    ? "No quests yet. Add one with ＋ New Quest or use the AI Coach!"
+                    : "No quests for this filter."}
+                </p>
+              ) : (
+                filteredAchievements.map((ach) => (
+                  <div key={ach.id} className="group relative">
+                    {editingId === ach.id ? (
+                      /* Inline edit */
+                      <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 space-y-2">
+                        <div className="flex items-center gap-3">
+                          <input
+                            ref={editInputRef}
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEdit();
+                              if (e.key === "Escape") cancelEdit();
+                            }}
+                          />
+                          <button
+                            onClick={saveEdit}
+                            className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                        <textarea
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Description…"
+                          rows={2}
+                          className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
+                        />
+                      </div>
+                    ) : (
+                      /* Normal row with hover actions */
+                      <div className="relative">
+                        <AchievementItem
+                          achievement={ach}
+                          onToggle={toggleAchievement}
+                        />
+                        {/* Hover actions */}
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => startEdit(ach)}
+                            className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-xs"
+                            title="Edit"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            onClick={() => handleDelete(ach.id)}
+                            className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-coral hover:bg-bg-1 transition-colors text-xs"
+                            title="Delete"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  /* Normal row with hover actions */
-                  <div className="relative">
-                    <AchievementItem
-                      achievement={ach}
-                      onToggle={toggleAchievement}
-                    />
-                    {/* Hover actions */}
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => startEdit(ach)}
-                        className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-xs"
-                        title="Edit"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        onClick={() => handleDelete(ach.id)}
-                        className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-coral hover:bg-bg-1 transition-colors text-xs"
-                        title="Delete"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Rewards — Main Track */}
