@@ -248,16 +248,20 @@ export default function GameDetailPage() {
   const totalStarsEarned = achievements
     .filter((a) => a.completed)
     .reduce((sum, a) => sum + a.starsRewarded, 0);
+  const totalPossibleStars = achievements.reduce(
+    (sum, a) => sum + a.starsRewarded,
+    0
+  );
 
   const filteredAchievements =
     filter === "all"
       ? achievements
       : achievements.filter((a) => a.difficulty === filter);
 
-  const progress = Math.min(
-    Math.round((game.lifetimeStars / game.totalPossibleStars) * 100),
-    100
-  );
+  const progress =
+    totalPossibleStars > 0
+      ? Math.min(Math.round((totalStarsEarned / totalPossibleStars) * 100), 100)
+      : 0;
 
   return (
     <div className="space-y-10 pb-16">
@@ -308,7 +312,7 @@ export default function GameDetailPage() {
                 <div className="text-lg font-syne font-bold text-text-primary">
                   {totalStarsEarned}{" "}
                   <span className="text-text-tertiary text-sm font-normal">
-                    / {game.totalPossibleStars}
+                    / {totalPossibleStars}
                   </span>
                 </div>
               </div>

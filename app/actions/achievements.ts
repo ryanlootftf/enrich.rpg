@@ -11,6 +11,24 @@ const STAR_MAP = {
 
 export type Difficulty = "easy" | "medium" | "hard";
 
+async function recalcGameStars(supabase: Awaited<ReturnType<typeof createClient>>, gameId: string) {
+  const { data: rows } = await supabase
+    .from("achievements")
+    .select("stars_rewarded, completed")
+    .eq("game_id", gameId);
+
+  const achRows = rows ?? [];
+  const totalPossible = achRows.reduce((sum, a) => sum + (a.stars_rewarded ?? 0), 0);
+  const lifetime = achRows
+    .filter((a) => a.completed)
+    .reduce((sum, a) => sum + (a.stars_rewarded ?? 0), 0);
+
+  await supabase
+    .from("games")
+    .update({ total_possible_stars: totalPossible, lifetime_stars: lifetime })
+    .eq("id", gameId);
+}
+
 export async function createAchievement(
   gameId: string,
   title: string,
@@ -41,6 +59,7 @@ export async function createAchievement(
 
   if (error) throw new Error(error.message);
 
+  await recalcGameStars(supabase, gameId);
   revalidatePath(`/games/${gameId}`);
 }
 
@@ -51,6 +70,7 @@ export async function deleteAchievement(id: string, gameId: string) {
 
   if (error) throw new Error(error.message);
 
+  await recalcGameStars(supabase, gameId);
   revalidatePath(`/games/${gameId}`);
 }
 
@@ -149,6 +169,7 @@ export async function updateAchievementProgressBy(
 
   if (error) throw new Error(error.message);
 
+  await recalcGameStars(supabase, gameId);
   revalidatePath(`/games/${gameId}`);
 }
 
@@ -183,5 +204,6 @@ export async function updateAchievementDifficulty(
 
   if (error) throw new Error(error.message);
 
+  await recalcGameStars(supabase, gameId);
   revalidatePath(`/games/${gameId}`);
 }
