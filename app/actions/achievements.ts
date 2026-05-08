@@ -137,6 +137,7 @@ export async function updateAchievementProgress(
 
   if (error) throw new Error(error.message);
 
+  await recalcGameStars(supabase, gameId);
   revalidatePath(`/games/${gameId}`);
 }
 
