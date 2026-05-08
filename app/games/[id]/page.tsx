@@ -429,68 +429,72 @@ export default function GameDetailPage() {
           </div>
         </div>
 
-        {/* Create form */}
+        {/* Create form — inline, blends into UI */}
         {showCreateForm && (
-          <div className="bg-bg-2 border border-border-subtle rounded-xl p-4 mb-4 space-y-3">
-            <input
-              ref={createInputRef}
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Quest title…"
-              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreate();
-                if (e.key === "Escape") setShowCreateForm(false);
-              }}
-            />
-            <textarea
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="Optional description…"
-              rows={2}
-              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-            />
-            <div className="flex items-center gap-3 flex-wrap">
-              <select
-                value={newDifficulty}
-                onChange={(e) =>
-                  setNewDifficulty(e.target.value as Difficulty)
-                }
-                className="bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
-              >
-                <option value="easy">Easy (1★)</option>
-                <option value="medium">Medium (3★)</option>
-                <option value="hard">Hard (5★)</option>
-              </select>
-              <label className="flex items-center gap-2 text-xs text-text-secondary">
-                Progress:
-                <input
-                  type="number"
-                  min={0}
-                  max={999}
-                  value={newProgressMax}
+          <div className="mb-4">
+            {/* Separator line */}
+            <div className="h-px bg-border-subtle mb-3" />
+            <div className="space-y-2.5">
+              <input
+                ref={createInputRef}
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Quest title…"
+                className="w-full bg-transparent border-b border-border-subtle px-0 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreate();
+                  if (e.key === "Escape") setShowCreateForm(false);
+                }}
+              />
+              <textarea
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                placeholder="Optional description…"
+                rows={1}
+                className="w-full bg-transparent border-b border-border-subtle px-0 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
+              />
+              <div className="flex items-center gap-3 flex-wrap pt-1">
+                <select
+                  value={newDifficulty}
                   onChange={(e) =>
-                    setNewProgressMax(Math.max(0, parseInt(e.target.value) || 0))
+                    setNewDifficulty(e.target.value as Difficulty)
                   }
-                  className="w-16 bg-bg-1 border border-border-subtle rounded-lg px-2 py-1.5 text-sm text-text-primary outline-none focus:border-accent transition-colors text-center"
-                  placeholder="0"
-                />
-                <span className="text-text-tertiary text-[10px]">steps</span>
-              </label>
-              <button
-                onClick={handleCreate}
-                disabled={creating || !newTitle.trim()}
-                className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {creating ? "Adding…" : "Add Quest"}
-              </button>
-              <button
-                onClick={() => setShowCreateForm(false)}
-                className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
-              >
-                Cancel
-              </button>
+                  className="bg-transparent border-b border-border-subtle px-0 py-1 text-sm text-text-primary outline-none focus:border-accent transition-colors"
+                >
+                  <option value="easy">Easy (1★)</option>
+                  <option value="medium">Medium (3★)</option>
+                  <option value="hard">Hard (5★)</option>
+                </select>
+                <label className="flex items-center gap-2 text-xs text-text-secondary">
+                  Progress:
+                  <input
+                    type="number"
+                    min={0}
+                    max={999}
+                    value={newProgressMax}
+                    onChange={(e) =>
+                      setNewProgressMax(Math.max(0, parseInt(e.target.value) || 0))
+                    }
+                    className="w-16 bg-transparent border-b border-border-subtle px-0 py-1 text-sm text-text-primary outline-none focus:border-accent transition-colors text-center"
+                    placeholder="0"
+                  />
+                  <span className="text-text-tertiary text-[10px]">steps</span>
+                </label>
+                <button
+                  onClick={handleCreate}
+                  disabled={creating || !newTitle.trim()}
+                  className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {creating ? "Adding…" : "Add Quest"}
+                </button>
+                <button
+                  onClick={() => setShowCreateForm(false)}
+                  className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}
