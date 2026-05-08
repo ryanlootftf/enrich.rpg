@@ -19,8 +19,14 @@ const diffColors: Record<string, string> = {
   hard: "text-coral",
 };
 
+const difficultyStars: Record<string, number> = {
+  easy: 1,
+  medium: 2,
+  hard: 3,
+};
+
 const diffConfig = [
-  { value: "easy" as Difficulty, label: "Easy", dot: "bg-green-400" },
+  { value: "easy" as Difficulty, label: "Easy", dot: "bg-green" },
   { value: "medium" as Difficulty, label: "Medium", dot: "bg-gold" },
   { value: "hard" as Difficulty, label: "Hard", dot: "bg-coral" },
 ];
@@ -338,7 +344,7 @@ export function QuestDetailModal({
 
           {/* Stars */}
           <div className="text-xs text-gold font-medium">
-            +{achievement.starsRewarded} ★
+            +{editing ? difficultyStars[editDifficulty] : achievement.starsRewarded} ★
           </div>
 
           {/* Progress section */}
@@ -451,7 +457,7 @@ export function QuestDetailModal({
             </button>
           )}
 
-          {/* Edit mode buttons */}
+          {/* Edit mode buttons: Save + Delete (red trash icon) */}
           {editing && (
             <div className="flex items-center gap-2">
               <button
@@ -462,25 +468,27 @@ export function QuestDetailModal({
                 {saving ? "Saving…" : "💾 Save changes"}
               </button>
               <button
-                onClick={() => setEditing(false)}
-                className="bg-transparent text-text-tertiary text-xs px-3 py-2.5 hover:text-text-secondary transition-colors"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="w-9 h-9 flex items-center justify-center rounded-lg border border-coral/40 text-coral hover:bg-coral/10 transition-colors disabled:opacity-40"
               >
-                Cancel
+                {deleting ? "…" : "🗑"}
               </button>
             </div>
           )}
         </div>
 
-        {/* Footer with delete */}
-        <div className="px-6 pb-6 pt-2">
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="w-full flex items-center justify-center gap-1.5 text-xs text-text-tertiary hover:text-coral py-2 transition-colors disabled:opacity-40"
-          >
-            {deleting ? "Deleting…" : "🗑 Delete quest"}
-          </button>
-        </div>
+        {/* Footer with Cancel (only in edit mode) */}
+        {editing && (
+          <div className="px-6 pb-6 pt-2">
+            <button
+              onClick={() => setEditing(false)}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary py-2 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
