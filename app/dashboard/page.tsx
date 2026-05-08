@@ -1,13 +1,25 @@
-"use client";
-
-import { useState } from "react";
-import { games } from "@/app/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { gameFromRow, type GameRow } from "@/lib/db-helpers";
 import { GameCard } from "@/components/games/game-card";
 import { NewGameCard } from "@/components/games/new-game-card";
 
-export default function DashboardPage() {
-  const regularGames = games.filter((g) => !g.isBonus);
-  const bonusGames = games.filter((g) => g.isBonus);
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  const { data: rows, error } = await supabase
+    .from("games")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch games:", error.message);
+  }
+
+  const allGames = (rows ?? []).map((row: GameRow) => gameFromRow(row));
+  const regularGames = allGames.filter((g: { isBonus?: boolean }) => !g.isBonus);
+  const bonusGames = allGames.filter((g: { isBonus?: boolean }) => g.isBonus);
 
   return (
     <div className="space-y-10">
