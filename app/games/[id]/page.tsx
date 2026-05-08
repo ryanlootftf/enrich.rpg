@@ -340,8 +340,11 @@ export default function GameDetailPage() {
         <p className="text-text-secondary text-sm mb-5">{game.description}</p>
 
         {achievements.length === 0 ? (
-          /* Empty state — no quests yet */
-          <div className="bg-bg-2 border border-dashed border-border-tertiary/40 rounded-2xl p-6 text-center space-y-3">
+          /* Empty state — no quests yet, clickable to open form */
+          <div
+            onClick={() => setShowCreateForm(true)}
+            className="bg-bg-2 border border-dashed border-border-tertiary/40 rounded-2xl p-6 text-center space-y-3 cursor-pointer hover:bg-bg-3 transition-colors"
+          >
             <div className="text-3xl">🧭</div>
             <div>
               <p className="text-sm font-syne font-semibold text-text-primary">
@@ -429,72 +432,74 @@ export default function GameDetailPage() {
           </div>
         </div>
 
-        {/* Create form — inline, blends into UI */}
+        {/* Create form — card with stepper */}
         {showCreateForm && (
-          <div className="mb-4">
-            {/* Separator line */}
-            <div className="h-px bg-border-subtle mb-3" />
-            <div className="space-y-2.5">
-              <input
-                ref={createInputRef}
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Quest title…"
-                className="w-full bg-transparent border-b border-border-subtle px-0 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleCreate();
-                  if (e.key === "Escape") setShowCreateForm(false);
-                }}
-              />
-              <textarea
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-                placeholder="Optional description…"
-                rows={1}
-                className="w-full bg-transparent border-b border-border-subtle px-0 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-              />
-              <div className="flex items-center gap-3 flex-wrap pt-1">
-                <select
-                  value={newDifficulty}
-                  onChange={(e) =>
-                    setNewDifficulty(e.target.value as Difficulty)
-                  }
-                  className="bg-transparent border-b border-border-subtle px-0 py-1 text-sm text-text-primary outline-none focus:border-accent transition-colors"
-                >
-                  <option value="easy">Easy (1★)</option>
-                  <option value="medium">Medium (3★)</option>
-                  <option value="hard">Hard (5★)</option>
-                </select>
-                <label className="flex items-center gap-2 text-xs text-text-secondary">
-                  Progress:
-                  <input
-                    type="number"
-                    min={0}
-                    max={999}
-                    value={newProgressMax}
-                    onChange={(e) =>
-                      setNewProgressMax(Math.max(0, parseInt(e.target.value) || 0))
-                    }
-                    className="w-16 bg-transparent border-b border-border-subtle px-0 py-1 text-sm text-text-primary outline-none focus:border-accent transition-colors text-center"
-                    placeholder="0"
-                  />
-                  <span className="text-text-tertiary text-[10px]">steps</span>
-                </label>
+          <div className="mb-4 bg-bg-2 border border-border-subtle rounded-xl p-4 space-y-3">
+            <input
+              ref={createInputRef}
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Quest title…"
+              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleCreate();
+                if (e.key === "Escape") setShowCreateForm(false);
+              }}
+            />
+            <textarea
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="Optional description…"
+              rows={2}
+              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
+            />
+            <div className="flex items-center gap-3 flex-wrap">
+              <select
+                value={newDifficulty}
+                onChange={(e) =>
+                  setNewDifficulty(e.target.value as Difficulty)
+                }
+                className="bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
+              >
+                <option value="easy">Easy (1★)</option>
+                <option value="medium">Medium (3★)</option>
+                <option value="hard">Hard (5★)</option>
+              </select>
+              <label className="flex items-center gap-1.5 text-xs text-text-secondary">
+                Progress:
                 <button
-                  onClick={handleCreate}
-                  disabled={creating || !newTitle.trim()}
-                  className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  type="button"
+                  onClick={() => setNewProgressMax(Math.max(0, newProgressMax - 1))}
+                  className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
                 >
-                  {creating ? "Adding…" : "Add Quest"}
+                  −
                 </button>
+                <span className="w-8 text-center text-sm font-medium text-text-primary tabular-nums">
+                  {newProgressMax}
+                </span>
                 <button
-                  onClick={() => setShowCreateForm(false)}
-                  className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
+                  type="button"
+                  onClick={() => setNewProgressMax(Math.min(999, newProgressMax + 1))}
+                  className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
                 >
-                  Cancel
+                  +
                 </button>
-              </div>
+                <span className="text-text-tertiary text-[10px]">steps</span>
+              </label>
+              <button
+                onClick={handleCreate}
+                disabled={creating || !newTitle.trim()}
+                className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {creating ? "Adding…" : "Add Quest"}
+              </button>
+              <button
+                onClick={() => setShowCreateForm(false)}
+                className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}
