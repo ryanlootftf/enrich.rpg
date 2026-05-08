@@ -43,7 +43,7 @@ export function RewardItem({ reward }: Props) {
 
   return (
     <div
-      className={`${bgClass} ${borderClass} border rounded-xl px-[14px] py-3 flex items-center gap-3 ${
+      className={`${bgClass} ${borderClass} border rounded-xl px-5 py-4 flex items-center gap-3 shadow-sm hover:shadow-md transition-all duration-200 ${
         isClaimed ? "opacity-50" : ""
       }`}
     >
@@ -60,10 +60,10 @@ export function RewardItem({ reward }: Props) {
       </div>
 
       <div className="flex-1">
-        <div className="text-[13px] font-medium text-text-primary">
+        <div className="text-sm font-semibold text-text-primary">
           {reward.title}
         </div>
-        <div className="text-[11px] text-text-tertiary mt-0.5">
+        <div className="text-[11px] text-zinc-500 mt-0">
           {reward.type === "BONUS_TRACK"
             ? "Bonus reward — every 25 stars"
             : `at ${reward.requiredStars} stars${

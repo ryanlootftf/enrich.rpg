@@ -2,10 +2,25 @@
 
 import type { Achievement } from "@/app/types";
 
-const diffColors: Record<string, string> = {
-  easy: "text-green",
-  medium: "text-gold-2",
-  hard: "text-coral",
+const diffPills: Record<string, { dot: string; text: string; bg: string; border: string }> = {
+  easy: {
+    dot: "bg-green",
+    text: "text-green",
+    bg: "bg-green/10",
+    border: "border-green/30",
+  },
+  medium: {
+    dot: "bg-gold",
+    text: "text-gold-2",
+    bg: "bg-gold/10",
+    border: "border-gold/30",
+  },
+  hard: {
+    dot: "bg-coral",
+    text: "text-coral",
+    bg: "bg-coral/10",
+    border: "border-coral/30",
+  },
 };
 
 interface Props {
@@ -23,58 +38,79 @@ export function AchievementItem({ achievement, onClick }: Props) {
       )
     : 0;
 
+  const pill = diffPills[achievement.difficulty] ?? diffPills.easy;
+
   return (
     <div
       onClick={() => onClick?.(achievement)}
-      className={`bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-2.5 transition-colors duration-150 hover:border-border-default cursor-pointer ${
-        done ? "opacity-60" : ""
+      className={`bg-bg-3 border rounded-xl px-5 py-4 flex items-center gap-3 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:scale-[1.01] hover:border-purple/30 ${
+        done
+          ? "border-green/50 opacity-70"
+          : "border-border-subtle"
       }`}
     >
+      {/* Completed checkmark */}
+      {done && (
+        <span className="text-green text-sm font-bold flex-shrink-0">✓</span>
+      )}
+
       {/* Title + Description + Progress */}
       <div className="flex-1 min-w-0">
-        <div
-          className={`text-[13px] font-medium ${
-            done ? "text-text-tertiary line-through" : "text-text-primary"
-          }`}
-        >
-          {achievement.title}
+        {/* Title row: title + stars */}
+        <div className="flex items-center gap-2">
+          <h4
+            className={`text-base font-semibold truncate ${
+              done ? "text-text-tertiary line-through" : "text-text-primary"
+            }`}
+          >
+            {achievement.title}
+          </h4>
+          {/* Stars — now beside title */}
+          <span className="text-xs font-bold text-gold whitespace-nowrap flex-shrink-0 drop-shadow-[0_0_4px_rgba(255,200,0,0.4)]">
+            +{achievement.starsRewarded} ★
+          </span>
         </div>
 
         {/* Description */}
         {achievement.description && (
-          <div className="text-[11px] text-text-tertiary mt-0.5 leading-snug truncate">
+          <p className="text-[11px] text-zinc-500 mt-0 leading-snug truncate">
             {achievement.description}
-          </div>
+          </p>
         )}
 
-        {/* Progress bar */}
+        {/* Progress row: bar + difficulty pill */}
         {hasProgress && !done && (
-          <div className="flex items-center gap-2 mt-1.5">
-            <div className="flex-1 h-1.5 bg-border-subtle rounded-full overflow-hidden">
+          <div className="flex items-center gap-2 mt-2">
+            <div className="flex-1 h-2 bg-[#2a2a35] rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-accent transition-[width] duration-300 ease-out"
+                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-accent transition-[width] duration-300 ease-out"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
-            <span className="text-[10px] font-medium text-accent-2 flex items-center gap-0.5 flex-shrink-0">
+            <span className="text-[10px] font-medium text-text-tertiary flex-shrink-0 leading-none">
               {achievement.progressCurrent}/{achievement.progressMax}
+            </span>
+            {/* Difficulty pill — inline with progress row */}
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text} flex-shrink-0`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${pill.dot}`} />
+              {achievement.difficulty}
             </span>
           </div>
         )}
 
-        {/* Difficulty label */}
-        <div
-          className={`text-[10px] mt-0.5 font-medium uppercase tracking-[0.06em] ${
-            diffColors[achievement.difficulty]
-          }`}
-        >
-          {achievement.difficulty}
-        </div>
-      </div>
-
-      {/* Stars */}
-      <div className="text-xs text-gold font-medium whitespace-nowrap flex-shrink-0">
-        +{achievement.starsRewarded} ★
+        {/* Difficulty pill for non-progress quests or completed — below title */}
+        {(!hasProgress || done) && (
+          <div className="mt-2">
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text}`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${pill.dot}`} />
+              {achievement.difficulty}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

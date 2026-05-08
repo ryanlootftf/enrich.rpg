@@ -558,7 +558,7 @@ export default function GameDetailPage() {
               ))}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {filteredAchievements.length === 0 ? (
                 <p className="text-text-tertiary text-xs py-6 text-center">
                   {achievements.length === 0
@@ -583,7 +583,7 @@ export default function GameDetailPage() {
       {mainRewards.length > 0 && (
         <section className="screen">
           <h2 className="section-label">Main Track Rewards</h2>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {mainRewards.map((reward) => (
               <RewardItem key={reward.id} reward={reward} />
             ))}
@@ -595,7 +595,7 @@ export default function GameDetailPage() {
       {bonusRewards.length > 0 && (
         <section className="screen">
           <div className="divider-label">Bonus Track Rewards</div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {bonusRewards.map((reward) => (
               <RewardItem key={reward.id} reward={reward} />
             ))}

@@ -45,8 +45,8 @@ export function GameCard({ game }: { game: Game }) {
 
   return (
     <Link href={`/games/${game.id}`} className="no-underline relative group">
-      <div className={`relative overflow-hidden bg-bg-2 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 ${
-        isEmpty ? "border-dashed border-border-tertiary/40 hover:border-border-default" : "border-border-subtle hover:border-border-default"
+      <div className={`relative overflow-hidden bg-bg-2 border rounded-2xl p-5 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${
+        isEmpty ? "border-dashed border-border-tertiary/40 hover:border-border-default hover:border-dashed" : "border-border-subtle hover:border-purple/20"
       }`}>
         {/* Top accent bar */}
         <div
@@ -115,7 +115,7 @@ export function GameCard({ game }: { game: Game }) {
         </div>
 
         {/* Mini progress bar */}
-        <div className="h-1 bg-border-subtle rounded-full overflow-hidden">
+        <div className="h-1.5 bg-[#2a2a35] rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full bg-gradient-to-r ${
               themeGradients[game.theme]
