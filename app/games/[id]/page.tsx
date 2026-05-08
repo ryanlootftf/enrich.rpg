@@ -432,73 +432,164 @@ export default function GameDetailPage() {
           </div>
         </div>
 
-        {/* Create form — card with stepper */}
+        {/* Create form */}
         {showCreateForm && (
-          <div className="mb-4 bg-bg-2 border border-border-subtle rounded-xl p-4 space-y-3">
-            <input
-              ref={createInputRef}
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Quest title…"
-              className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreate();
-                if (e.key === "Escape") setShowCreateForm(false);
-              }}
-            />
-            <div className="h-px bg-border-subtle" />
-            <textarea
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="Optional description…"
-              rows={2}
-              className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-            />
-            <div className="h-px bg-border-subtle" />
-            <div className="flex items-center gap-3 flex-wrap isolate">
-              <select
-                value={newDifficulty}
-                onChange={(e) =>
-                  setNewDifficulty(e.target.value as Difficulty)
-                }
-                className="bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
-              >
-                <option value="easy">Easy (1★)</option>
-                <option value="medium">Medium (3★)</option>
-                <option value="hard">Hard (5★)</option>
-              </select>
-              <span className="flex items-center gap-1.5 text-xs text-text-secondary">
-                Progress:
-                <button
-                  type="button"
-                  onClick={() => setNewProgressMax(Math.max(0, newProgressMax - 1))}
-                  className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
-                >
-                  −
-                </button>
-                <span className="w-8 text-center text-sm font-medium text-text-primary tabular-nums">
-                  {newProgressMax}
+          <div className="mb-4 space-y-3">
+            {/* ── Quest details card ── */}
+            <div className="bg-bg-2 border border-border-subtle rounded-xl p-4 space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  Quest title
+                </label>
+                <input
+                  ref={createInputRef}
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="e.g. Read 5 books"
+                  maxLength={60}
+                  className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreate();
+                    if (e.key === "Escape") setShowCreateForm(false);
+                  }}
+                />
+                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                  {newTitle.length}/60
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setNewProgressMax(Math.min(999, newProgressMax + 1))}
-                  className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
-                >
-                  +
-                </button>
-                <span className="text-text-tertiary text-[10px]">steps</span>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    el.style.height = "auto";
+                    el.style.height = el.scrollHeight + "px";
+                  }}
+                  placeholder="What's the goal? Any rewards or context..."
+                  maxLength={200}
+                  rows={2}
+                  className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none min-h-[80px]"
+                />
+                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                  {newDescription.length}/200
+                </span>
+              </div>
+            </div>
+
+            {/* ── Quest settings card ── */}
+            <div className="bg-bg-3/50 border border-border-subtle/50 rounded-xl p-4 space-y-4">
+              <span className="block text-[11px] font-medium text-text-secondary uppercase tracking-wider">
+                Quest settings
               </span>
+
+              {/* Difficulty toggles */}
+              <div>
+                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                  Difficulty
+                </span>
+                <div className="flex gap-2">
+                  {(
+                    [
+                      { value: "easy", label: "Easy", dot: "bg-green-400" },
+                      { value: "medium", label: "Medium", dot: "bg-gold" },
+                      { value: "hard", label: "Hard", dot: "bg-coral" },
+                    ] as const
+                  ).map(({ value, label, dot }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setNewDifficulty(value as Difficulty)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
+                        newDifficulty === value
+                          ? "border-accent bg-accent/10 text-accent-2"
+                          : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${dot}`} />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Steps counter */}
+              <div>
+                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                  Steps
+                </span>
+                <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setNewProgressMax(Math.max(0, newProgressMax - 1))
+                    }
+                    className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 text-center text-sm font-medium text-text-primary tabular-nums">
+                    {newProgressMax}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setNewProgressMax(Math.min(999, newProgressMax + 1))
+                    }
+                    className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
+                  >
+                    +
+                  </button>
+                  <span className="text-text-tertiary text-[10px]">steps</span>
+                </div>
+                {/* Progress bar */}
+                <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden mb-2">
+                  <div
+                    className="h-full bg-accent rounded-full transition-[width] duration-200"
+                    style={{
+                      width: `${Math.min((newProgressMax / 100) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+                {/* Presets */}
+                <div className="flex gap-1.5">
+                  {[3, 5, 10, 20].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setNewProgressMax(n)}
+                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors ${
+                        newProgressMax === n
+                          ? "border-accent bg-accent/10 text-accent-2"
+                          : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Buttons ── */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleCreate}
                 disabled={creating || !newTitle.trim()}
-                className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-[#534AB7] text-white text-xs font-medium px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {creating ? "Adding…" : "Add Quest"}
+                {creating ? "Adding…" : "⚡ Add Quest"}
               </button>
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
+                className="bg-transparent text-text-tertiary text-xs px-3 py-2.5 hover:text-text-secondary transition-colors"
               >
                 Cancel
               </button>
