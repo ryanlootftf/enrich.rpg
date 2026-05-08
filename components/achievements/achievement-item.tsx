@@ -30,7 +30,7 @@ interface Props {
 
 export function AchievementItem({ achievement, onClick }: Props) {
   const done = achievement.completed;
-  const hasProgress = achievement.progressMax > 0;
+  const hasProgress = achievement.progressMax > 1;
   const progressPct = hasProgress
     ? Math.min(
         Math.round((achievement.progressCurrent / achievement.progressMax) * 100),

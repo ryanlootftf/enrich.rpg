@@ -34,7 +34,7 @@ export async function createAchievement(
     description: description?.trim() ?? "",
     difficulty,
     stars_rewarded: starsRewarded,
-    progress_max: progressMax ?? 0,
+    progress_max: progressMax ?? 1,
     progress_current: 0,
     completed: false,
   });

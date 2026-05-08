@@ -81,7 +81,7 @@ export function QuestDetailModal({
 
   const done = achievement.completed;
   const progressCurrent = achievement.progressCurrent;
-  const hasProgress = achievement.progressMax > 0;
+  const hasProgress = achievement.progressMax > 1;
   const progressPct = hasProgress
     ? Math.min(Math.round((progressCurrent / achievement.progressMax) * 100), 100)
     : 0;
@@ -141,23 +141,13 @@ export function QuestDetailModal({
         const delta = modalCurrent - dbCurrent;
         if (delta !== 0) {
           await updateAchievementProgressBy(achievement.id, gameId, delta);
-        } else {
-          // completed might have changed even if progress didn't (no-progress quests)
-          // Toggle complete on a non-progress quest toggles progressCurrent 0→0
-          // but completed state changes. In that case, delta=0 won't persist.
-          // Force persist by calling with delta of 1 then -1? No — simpler to check completed.
-          // Actually for non-progress quests, completed just flips without progress change,
-          // so we need to call updateAchievementProgressBy with a delta that flips it.
-          // Let's use the helper action properly: it increments by delta and auto-sets completed.
-          // But if delta=0, the action does nothing. So for non-progress toggles, we need
-          // to force a different approach. Let's just persist completed directly via a server call.
-          if (dbRow.completed !== achievement.completed) {
-            // Flip via a custom delta approach: set progress to max if completing, 0 if not
-            const forceDelta = achievement.completed
-              ? (achievement.progressMax > 0 ? achievement.progressMax - dbCurrent : 1)
-              : -dbCurrent;
-            await updateAchievementProgressBy(achievement.id, gameId, forceDelta);
-          }
+        } else if (dbRow.completed !== achievement.completed) {
+          // delta=0 but completed changed → persist just the completed flag directly
+          const { error } = await supabase
+            .from("achievements")
+            .update({ completed: achievement.completed })
+            .eq("id", achievement.id);
+          if (error) throw new Error(error.message);
         }
       }
 
@@ -419,7 +409,7 @@ export function QuestDetailModal({
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => setEditProgressMax(Math.max(0, editProgressMax - 1))}
+                       onClick={() => setEditProgressMax(Math.max(1, editProgressMax - 1))}
                       className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-sm leading-none"
                     >
                       −
@@ -437,7 +427,7 @@ export function QuestDetailModal({
                     <span className="text-text-tertiary text-[10px]">steps</span>
                   </div>
                   <div className="flex gap-1.5 mt-2">
-                    {[3, 5, 10, 20].map((n) => (
+                    {[1, 3, 5, 10].map((n) => (
                       <button
                         key={n}
                         type="button"

@@ -91,7 +91,7 @@ export default function GameDetailPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newDifficulty, setNewDifficulty] = useState<Difficulty>("easy");
-  const [newProgressMax, setNewProgressMax] = useState(0);
+  const [newProgressMax, setNewProgressMax] = useState(1);
   const [creating, setCreating] = useState(false);
 
   // Modal state
@@ -471,7 +471,7 @@ export default function GameDetailPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      setNewProgressMax(Math.max(0, newProgressMax - 1))
+                      setNewProgressMax(Math.max(1, newProgressMax - 1))
                     }
                     className="w-6 h-6 flex items-center justify-center rounded-md bg-bg-1 border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent transition-colors text-sm leading-none"
                   >
@@ -502,7 +502,7 @@ export default function GameDetailPage() {
                 </div>
                 {/* Presets */}
                 <div className="flex gap-1.5">
-                  {[3, 5, 10, 20].map((n) => (
+                  {[1, 3, 5, 10].map((n) => (
                     <button
                       key={n}
                       type="button"
