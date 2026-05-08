@@ -1,18 +1,14 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import {
-  getGameById,
-  getAchievementsForGame,
-  getMainTrackRewards,
-  getBonusTrackRewards,
-  mockAIResults,
-} from "@/app/mock-data";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { gameFromRow, type GameRow } from "@/lib/db-helpers";
+import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
 import { AchievementItem } from "@/components/achievements/achievement-item";
 import { RewardItem } from "@/components/rewards/reward-item";
 import { AIModal } from "@/components/ai/ai-modal";
-import type { FilterDifficulty } from "@/app/types";
+import { mockAIResults } from "@/app/mock-data";
 
 const themeGradients: Record<string, string> = {
   purple: "from-[#7c6aff] to-[#a08bff]",
@@ -21,26 +17,141 @@ const themeGradients: Record<string, string> = {
   gold: "from-[#f4c430] to-[#fbbf24]",
 };
 
+interface AchievementRow {
+  id: string;
+  game_id: string;
+  title: string;
+  difficulty: string;
+  stars_rewarded: number;
+  completed: boolean;
+}
+
+interface RewardRow {
+  id: string;
+  game_id: string;
+  title: string;
+  required_stars: number;
+  type: string;
+  claimed: boolean;
+  emoji: string;
+  is_final: boolean;
+}
+
+function achievementFromRow(row: AchievementRow): Achievement {
+  return {
+    id: row.id,
+    gameId: row.game_id,
+    title: row.title,
+    difficulty: row.difficulty as Achievement["difficulty"],
+    starsRewarded: row.stars_rewarded,
+    completed: row.completed,
+  };
+}
+
+function rewardFromRow(row: RewardRow): Reward {
+  return {
+    id: row.id,
+    gameId: row.game_id,
+    title: row.title,
+    requiredStars: row.required_stars,
+    type: row.type as Reward["type"],
+    claimed: row.claimed,
+    emoji: row.emoji,
+  };
+}
+
 export default function GameDetailPage() {
   const params = useParams();
   const router = useRouter();
   const gameId = params.id as string;
-  const game = getGameById(gameId);
+  const supabase = createClient();
 
+  const [game, setGame] = useState<Game | null | undefined>(undefined);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [mainRewards, setMainRewards] = useState<Reward[]>([]);
+  const [bonusRewards, setBonusRewards] = useState<Reward[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterDifficulty>("all");
   const [aiOpen, setAiOpen] = useState(false);
 
-  const [achievements, setAchievements] = useState(() =>
-    getAchievementsForGame(gameId)
-  );
-  const mainRewards = getMainTrackRewards(gameId);
-  const bonusRewards = getBonusTrackRewards(gameId);
+  // Fetch game + achievements + rewards from Supabase
+  useEffect(() => {
+    async function load() {
+      // Fetch game
+      const { data: gameRow } = await supabase
+        .from("games")
+        .select("*")
+        .eq("id", gameId)
+        .single();
 
-  const toggleAchievement = (id: string) => {
+      if (!gameRow) {
+        setGame(null);
+        setLoading(false);
+        return;
+      }
+
+      setGame(gameFromRow(gameRow as GameRow));
+
+      // Fetch achievements
+      const { data: achRows } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: true });
+
+      const achs = (achRows ?? []).map((r: AchievementRow) => achievementFromRow(r));
+      setAchievements(achs);
+
+      // Fetch rewards
+      const { data: rewRows } = await supabase
+        .from("rewards")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("required_stars", { ascending: true });
+
+      const allRewards = (rewRows ?? []).map((r: RewardRow) => rewardFromRow(r));
+      setMainRewards(allRewards.filter((r) => r.type === "MAIN_TRACK"));
+      setBonusRewards(allRewards.filter((r) => r.type === "BONUS_TRACK"));
+
+      setLoading(false);
+    }
+
+    load();
+  }, [gameId, supabase]);
+
+  const toggleAchievement = async (id: string) => {
+    // Optimistic update
+    const prev = achievements;
     setAchievements((prev) =>
       prev.map((a) => (a.id === id ? { ...a, completed: !a.completed } : a))
     );
+
+    // Find the achievement being toggled
+    const ach = achievements.find((a) => a.id === id);
+    if (!ach) return;
+
+    const newCompleted = !ach.completed;
+
+    // Update in Supabase — the DB trigger handles star counting
+    const { error } = await supabase
+      .from("achievements")
+      .update({ completed: newCompleted })
+      .eq("id", id);
+
+    if (error) {
+      // Revert on error
+      setAchievements(prev);
+      console.error("Failed to toggle achievement:", error.message);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-text-tertiary text-sm animate-pulse">Loading…</div>
+      </div>
+    );
+  }
 
   if (!game) {
     return (
@@ -181,7 +292,9 @@ export default function GameDetailPage() {
         <div className="flex flex-col gap-2">
           {filteredAchievements.length === 0 ? (
             <p className="text-text-tertiary text-xs py-6 text-center">
-              No quests for this filter.
+              {achievements.length === 0
+                ? "No quests yet. Use the AI Coach to generate some!"
+                : "No quests for this filter."}
             </p>
           ) : (
             filteredAchievements.map((ach) => (
