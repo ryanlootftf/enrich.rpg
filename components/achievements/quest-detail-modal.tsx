@@ -48,7 +48,7 @@ export function QuestDetailModal({
 }: Props) {
   const supabase = createClient();
 
-  // Edit mode
+  // ── Edit mode ──
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(achievement.title);
   const [editDescription, setEditDescription] = useState(achievement.description);
@@ -60,10 +60,11 @@ export function QuestDetailModal({
   // Saving state
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
-  // Re-sync edit form fields when the achievement prop changes (e.g. after an update)
+  // Re-sync edit form fields when the achievement prop changes
   useEffect(() => {
     setEditTitle(achievement.title);
     setEditDescription(achievement.description);
@@ -85,93 +86,82 @@ export function QuestDetailModal({
     ? Math.min(Math.round((progressCurrent / achievement.progressMax) * 100), 100)
     : 0;
 
-  const handleProgressDelta = async (delta: number) => {
-    // Optimistic update on the parent
+  // ── Optimistic-only mutations (instant UI, no server call yet) ──
+  const handleProgressDelta = (delta: number) => {
     const newCurrent = Math.max(
       0,
       Math.min(progressCurrent + delta, achievement.progressMax)
     );
     const newCompleted = hasProgress ? newCurrent >= achievement.progressMax : done;
     onUpdate({ ...achievement, progressCurrent: newCurrent, completed: newCompleted });
-
-    try {
-      await updateAchievementProgressBy(achievement.id, gameId, delta);
-      const { data: achRow } = await supabase
-        .from("achievements")
-        .select("*")
-        .eq("id", achievement.id)
-        .single();
-      if (achRow) {
-        onUpdate({
-          ...achievement,
-          progressCurrent: achRow.progress_current ?? 0,
-          completed: achRow.completed ?? false,
-        });
-      }
-    } catch (err) {
-      // Revert on parent
-      onUpdate({
-        ...achievement,
-        progressCurrent: achievement.progressCurrent,
-        completed: achievement.completed,
-      });
-      console.error("Failed to update progress:", err);
-    }
+    setHasChanges(true);
   };
 
-  const handleToggleComplete = async () => {
+  const handleToggleComplete = () => {
     const newCompleted = !done;
-    const newCurrent = newCompleted
-      ? achievement.progressMax
-      : 0;
-
-    // Optimistic update on the parent
+    const newCurrent = newCompleted ? achievement.progressMax : 0;
     onUpdate({ ...achievement, progressCurrent: newCurrent, completed: newCompleted });
-
-    try {
-      const delta = newCompleted
-        ? achievement.progressMax - progressCurrent
-        : -progressCurrent;
-      await updateAchievementProgressBy(achievement.id, gameId, delta);
-      const { data: achRow } = await supabase
-        .from("achievements")
-        .select("*")
-        .eq("id", achievement.id)
-        .single();
-      if (achRow) {
-        onUpdate({
-          ...achievement,
-          progressCurrent: achRow.progress_current ?? 0,
-          completed: achRow.completed ?? false,
-        });
-      }
-    } catch (err) {
-      // Revert on parent
-      onUpdate({
-        ...achievement,
-        progressCurrent: achievement.progressCurrent,
-        completed: achievement.completed,
-      });
-      console.error("Failed to toggle complete:", err);
-    }
+    setHasChanges(true);
   };
 
-  const handleSaveEdits = async () => {
+  // ── Save: batch-persist everything in one go ──
+  const handleSave = async () => {
     setSaving(true);
     try {
-      if (editTitle.trim() && editTitle.trim() !== achievement.title) {
-        await updateAchievementTitle(achievement.id, gameId, editTitle.trim());
-      }
-      if (editDescription.trim() !== achievement.description) {
-        await updateAchievementDescription(achievement.id, gameId, editDescription.trim());
-      }
-      if (editProgressMax !== achievement.progressMax) {
-        await updateAchievementProgressMax(achievement.id, gameId, editProgressMax);
-      }
-      if (editDifficulty !== achievement.difficulty) {
-        await updateAchievementDifficulty(achievement.id, gameId, editDifficulty);
+      // Step 1: Persist edit-mode fields (title, description, difficulty, progressMax)
+      if (editing) {
+        if (editTitle.trim() && editTitle.trim() !== achievement.title) {
+          await updateAchievementTitle(achievement.id, gameId, editTitle.trim());
+        }
+        if (editDescription.trim() !== achievement.description) {
+          await updateAchievementDescription(achievement.id, gameId, editDescription.trim());
+        }
+        if (editDifficulty !== achievement.difficulty) {
+          await updateAchievementDifficulty(achievement.id, gameId, editDifficulty);
+        }
+        if (editProgressMax !== achievement.progressMax) {
+          await updateAchievementProgressMax(achievement.id, gameId, editProgressMax);
+        }
       }
 
+      // Step 2: Persist progress + completed changes via a single delta call
+      // The delta is the difference between what the modal shows now vs what the DB has.
+      // We need to calculate this from the last known DB values.
+      // Since we've been optimistic, we compare current achievement prop against original.
+      // But the simplest approach: fetch the current DB row, compute delta from it.
+      const { data: dbRow } = await supabase
+        .from("achievements")
+        .select("progress_current, progress_max, completed")
+        .eq("id", achievement.id)
+        .single();
+
+      if (dbRow) {
+        const dbCurrent = dbRow.progress_current ?? 0;
+        const modalCurrent = achievement.progressCurrent;
+        const delta = modalCurrent - dbCurrent;
+        if (delta !== 0) {
+          await updateAchievementProgressBy(achievement.id, gameId, delta);
+        } else {
+          // completed might have changed even if progress didn't (no-progress quests)
+          // Toggle complete on a non-progress quest toggles progressCurrent 0→0
+          // but completed state changes. In that case, delta=0 won't persist.
+          // Force persist by calling with delta of 1 then -1? No — simpler to check completed.
+          // Actually for non-progress quests, completed just flips without progress change,
+          // so we need to call updateAchievementProgressBy with a delta that flips it.
+          // Let's use the helper action properly: it increments by delta and auto-sets completed.
+          // But if delta=0, the action does nothing. So for non-progress toggles, we need
+          // to force a different approach. Let's just persist completed directly via a server call.
+          if (dbRow.completed !== achievement.completed) {
+            // Flip via a custom delta approach: set progress to max if completing, 0 if not
+            const forceDelta = achievement.completed
+              ? (achievement.progressMax > 0 ? achievement.progressMax - dbCurrent : 1)
+              : -dbCurrent;
+            await updateAchievementProgressBy(achievement.id, gameId, forceDelta);
+          }
+        }
+      }
+
+      // Step 3: Refetch full row from DB and sync back to parent
       const { data: achRow } = await supabase
         .from("achievements")
         .select("*")
@@ -179,22 +169,23 @@ export function QuestDetailModal({
         .single();
 
       if (achRow) {
-        const updated: Achievement = {
+        onUpdate({
           ...achievement,
           title: editTitle.trim(),
           description: editDescription.trim(),
-          progressMax: editProgressMax,
-          difficulty: editDifficulty as Achievement["difficulty"],
+          progressMax: editing ? editProgressMax : achievement.progressMax,
+          difficulty: (editing ? editDifficulty : achievement.difficulty) as Achievement["difficulty"],
           starsRewarded: achRow.stars_rewarded ?? achievement.starsRewarded,
-          progressCurrent: achRow.progress_current ?? progressCurrent,
-          completed: achRow.completed ?? done,
-        };
-        onUpdate(updated);
+          progressCurrent: achRow.progress_current ?? 0,
+          completed: achRow.completed ?? false,
+        });
       }
 
-      setEditing(false);
+      // Step 4: Exit edit mode if we were in it, clear dirty flag
+      if (editing) setEditing(false);
+      setHasChanges(false);
     } catch (err) {
-      console.error("Failed to save edits:", err);
+      console.error("Failed to save:", err);
     } finally {
       setSaving(false);
     }
@@ -215,6 +206,7 @@ export function QuestDetailModal({
 
   const pill = diffPills[achievement.difficulty] ?? diffPills.easy;
   const starCount = editing ? difficultyStars[editDifficulty] : achievement.starsRewarded;
+  const showSave = editing || hasChanges;
 
   return (
     <div
@@ -234,7 +226,7 @@ export function QuestDetailModal({
             Quest Details
           </h3>
           <div className="flex items-center gap-1.5">
-            {!editing && (
+            {!editing && !hasChanges && (
               <button
                 onClick={() => {
                   setEditTitle(achievement.title);
@@ -465,7 +457,7 @@ export function QuestDetailModal({
             </div>
           )}
 
-          {/* Mark as complete — solid filled button */}
+          {/* Mark as complete / incomplete — solid filled button */}
           {!editing && (
             <button
               onClick={handleToggleComplete}
@@ -480,23 +472,25 @@ export function QuestDetailModal({
             </button>
           )}
 
-          {/* Edit mode buttons: Save + Delete (red trash icon) */}
-          {editing && (
+          {/* Save + Delete buttons (shown when editing OR when there are unsaved changes) */}
+          {showSave && (
             <div className="flex items-center gap-2">
               <button
-                onClick={handleSaveEdits}
-                disabled={saving || !editTitle.trim()}
+                onClick={handleSave}
+                disabled={saving || (editing && !editTitle.trim())}
                 className="flex-1 bg-[#534AB7] text-white text-xs font-medium px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving…" : "💾 Save changes"}
               </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="w-9 h-9 flex items-center justify-center rounded-lg border border-coral/40 text-coral hover:bg-coral/10 transition-colors disabled:opacity-40"
-              >
-                {deleting ? "…" : "🗑"}
-              </button>
+              {editing && (
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-coral/40 text-coral hover:bg-coral/10 transition-colors disabled:opacity-40"
+                >
+                  {deleting ? "…" : "🗑"}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -505,7 +499,33 @@ export function QuestDetailModal({
         {editing && (
           <div className="px-6 pb-6 pt-2">
             <button
-              onClick={() => setEditing(false)}
+              onClick={() => {
+                setEditing(false);
+                // Also revert any unsaved progress changes when cancelling edit
+                if (hasChanges) {
+                  setHasChanges(false);
+                  // Re-fetch from DB to revert optimistic state
+                  supabase
+                    .from("achievements")
+                    .select("*")
+                    .eq("id", achievement.id)
+                    .single()
+                    .then(({ data }) => {
+                      if (data) {
+                        onUpdate({
+                          ...achievement,
+                          title: data.title,
+                          description: data.description ?? "",
+                          difficulty: data.difficulty as Achievement["difficulty"],
+                          starsRewarded: data.stars_rewarded ?? achievement.starsRewarded,
+                          progressMax: data.progress_max ?? 0,
+                          progressCurrent: data.progress_current ?? 0,
+                          completed: data.completed ?? false,
+                        });
+                      }
+                    });
+                }
+              }}
               className="w-full flex items-center justify-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary py-2 transition-colors"
             >
               Cancel
