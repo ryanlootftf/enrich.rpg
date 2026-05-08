@@ -222,19 +222,28 @@ export function QuestDetailModal({
 
         {/* Body */}
         <div className="px-6 py-4 space-y-5">
-          {/* Title & Edit button */}
-          <div className="flex items-start justify-between gap-3">
+          {/* Title */}
+          <div>
+            <span className="block text-[11px] font-medium text-text-secondary mb-1">
+              Quest title
+            </span>
             {editing ? (
-              <input
-                ref={titleInputRef}
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                maxLength={60}
-                className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-              />
+              <>
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="e.g. Read 5 books"
+                  maxLength={60}
+                  className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                />
+                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                  {editTitle.length}/60
+                </span>
+              </>
             ) : (
-              <div className="flex-1">
+              <>
                 <div
                   className={`text-[15px] font-syne font-semibold ${
                     completed ? "text-text-tertiary line-through" : "text-text-primary"
@@ -242,21 +251,21 @@ export function QuestDetailModal({
                 >
                   {achievement.title}
                 </div>
-              </div>
-            )}
-            {!editing && (
-              <button
-                onClick={() => {
-                  setEditTitle(achievement.title);
-                  setEditDescription(achievement.description);
-                  setEditProgressMax(achievement.progressMax);
-                  setEditDifficulty(achievement.difficulty as Difficulty);
-                  setEditing(true);
-                }}
-                className="text-xs text-accent-2 hover:text-accent font-medium transition-colors flex-shrink-0"
-              >
-                ✎ Edit
-              </button>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    onClick={() => {
+                      setEditTitle(achievement.title);
+                      setEditDescription(achievement.description);
+                      setEditProgressMax(achievement.progressMax);
+                      setEditDifficulty(achievement.difficulty as Difficulty);
+                      setEditing(true);
+                    }}
+                    className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
+                  >
+                    ✎ Edit
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
@@ -300,19 +309,24 @@ export function QuestDetailModal({
               Description
             </span>
             {editing ? (
-              <textarea
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.style.height = "auto";
-                  el.style.height = el.scrollHeight + "px";
-                }}
-                placeholder="What's the goal?"
-                maxLength={200}
-                rows={2}
-                className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
-              />
+              <>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    el.style.height = "auto";
+                    el.style.height = el.scrollHeight + "px";
+                  }}
+                  placeholder="What's the goal? Any rewards or context..."
+                  maxLength={200}
+                  rows={2}
+                  className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none min-h-[80px]"
+                />
+                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                  {editDescription.length}/200
+                </span>
+              </>
             ) : (
               <p className="text-sm text-text-secondary leading-relaxed">
                 {achievement.description || (
