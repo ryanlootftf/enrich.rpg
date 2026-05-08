@@ -19,6 +19,12 @@ const diffColors: Record<string, string> = {
   hard: "text-coral",
 };
 
+const diffDots: Record<string, string> = {
+  easy: "bg-green",
+  medium: "bg-gold",
+  hard: "bg-coral",
+};
+
 const difficultyStars: Record<string, number> = {
   easy: 1,
   medium: 2,
@@ -230,9 +236,6 @@ export function QuestDetailModal({
         <div className="px-6 py-4 space-y-5">
           {/* Title */}
           <div>
-            <span className="block text-[11px] font-medium text-text-secondary mb-1">
-              Quest title
-            </span>
             {editing ? (
               <>
                 <input
@@ -301,19 +304,19 @@ export function QuestDetailModal({
                 </div>
               </div>
             ) : (
-              <div
-                className={`text-[11px] font-medium uppercase tracking-[0.06em] ${diffColors[achievement.difficulty]}`}
-              >
-                {achievement.difficulty}
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${diffDots[achievement.difficulty]}`} />
+                <span
+                  className={`text-[11px] font-medium uppercase tracking-[0.06em] ${diffColors[achievement.difficulty]}`}
+                >
+                  {achievement.difficulty}
+                </span>
               </div>
             )}
           </div>
 
           {/* Description */}
           <div>
-            <span className="block text-[11px] font-medium text-text-secondary mb-1">
-              Description
-            </span>
             {editing ? (
               <>
                 <textarea
