@@ -14,7 +14,9 @@ export type Difficulty = "easy" | "medium" | "hard";
 export async function createAchievement(
   gameId: string,
   title: string,
-  difficulty: Difficulty
+  difficulty: Difficulty,
+  description?: string,
+  progressMax?: number
 ) {
   const supabase = await createClient();
 
@@ -29,8 +31,11 @@ export async function createAchievement(
     game_id: gameId,
     user_id: user.id,
     title: title.trim(),
+    description: description?.trim() ?? "",
     difficulty,
     stars_rewarded: starsRewarded,
+    progress_max: progressMax ?? 0,
+    progress_current: 0,
     completed: false,
   });
 
@@ -59,6 +64,55 @@ export async function updateAchievementTitle(
   const { error } = await supabase
     .from("achievements")
     .update({ title: title.trim() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}
+
+export async function updateAchievementDescription(
+  id: string,
+  gameId: string,
+  description: string
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("achievements")
+    .update({ description: description.trim() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}
+
+export async function updateAchievementProgress(
+  id: string,
+  gameId: string
+) {
+  const supabase = await createClient();
+
+  // Fetch current state
+  const { data: ach, error: fetchErr } = await supabase
+    .from("achievements")
+    .select("progress_current, progress_max, completed")
+    .eq("id", id)
+    .single();
+
+  if (fetchErr || !ach) throw new Error(fetchErr?.message ?? "Not found");
+  if (ach.completed) return; // already done, no-op
+
+  const newCurrent = (ach.progress_current ?? 0) + 1;
+  const newCompleted = newCurrent >= (ach.progress_max ?? 0);
+
+  const { error } = await supabase
+    .from("achievements")
+    .update({
+      progress_current: newCurrent,
+      completed: newCompleted,
+    })
     .eq("id", id);
 
   if (error) throw new Error(error.message);

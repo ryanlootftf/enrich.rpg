@@ -86,15 +86,20 @@ export function AIModal({ isOpen, onClose, gameTitle, results }: Props) {
                 {result.selected && "✓"}
               </div>
 
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-text-primary">
-                  {result.title}
-                </div>
-                <span className="text-[11px] text-text-tertiary mt-0.5 inline-flex items-center gap-1">
-                  {diffConfig[result.difficulty]?.icon}{" "}
-                  {diffConfig[result.difficulty]?.label}
-                </span>
-              </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium text-text-primary">
+                      {result.title}
+                    </div>
+                    {result.description && (
+                      <div className="text-[11px] text-text-tertiary mt-0.5 leading-snug truncate">
+                        {result.description}
+                      </div>
+                    )}
+                    <span className="text-[11px] text-text-tertiary mt-0.5 inline-flex items-center gap-1">
+                      {diffConfig[result.difficulty]?.icon}{" "}
+                      {diffConfig[result.difficulty]?.label}
+                    </span>
+                  </div>
 
               <div className="text-xs text-gold font-medium whitespace-nowrap">
                 +{result.starsRewarded} ★

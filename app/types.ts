@@ -16,9 +16,12 @@ export interface Achievement {
   id: string;
   gameId: string;
   title: string;
+  description: string;
   difficulty: Difficulty;
   starsRewarded: number;
   completed: boolean;
+  progressMax: number;
+  progressCurrent: number;
 }
 
 export interface Reward {
@@ -36,6 +39,7 @@ export type FilterDifficulty = "all" | "easy" | "medium" | "hard";
 
 export interface AIResult {
   title: string;
+  description: string;
   difficulty: Difficulty;
   starsRewarded: number;
   selected: boolean;

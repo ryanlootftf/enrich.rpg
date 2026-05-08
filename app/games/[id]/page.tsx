@@ -13,6 +13,7 @@ import {
   createAchievement,
   deleteAchievement,
   updateAchievementTitle,
+  updateAchievementDescription,
   type Difficulty,
 } from "@/app/actions/achievements";
 
@@ -27,9 +28,12 @@ interface AchievementRow {
   id: string;
   game_id: string;
   title: string;
+  description: string;
   difficulty: string;
   stars_rewarded: number;
   completed: boolean;
+  progress_max: number;
+  progress_current: number;
 }
 
 interface RewardRow {
@@ -48,9 +52,12 @@ function achievementFromRow(row: AchievementRow): Achievement {
     id: row.id,
     gameId: row.game_id,
     title: row.title,
+    description: row.description ?? "",
     difficulty: row.difficulty as Achievement["difficulty"],
     starsRewarded: row.stars_rewarded,
     completed: row.completed,
+    progressMax: row.progress_max ?? 0,
+    progressCurrent: row.progress_current ?? 0,
   };
 }
 
@@ -83,12 +90,15 @@ export default function GameDetailPage() {
   // Create form state
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [newDifficulty, setNewDifficulty] = useState<Difficulty>("easy");
+  const [newProgressMax, setNewProgressMax] = useState(0);
   const [creating, setCreating] = useState(false);
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // Refs for focus management
   const createInputRef = useRef<HTMLInputElement>(null);
@@ -184,9 +194,17 @@ export default function GameDetailPage() {
     if (!newTitle.trim()) return;
     setCreating(true);
     try {
-      await createAchievement(gameId, newTitle.trim(), newDifficulty);
+      await createAchievement(
+        gameId,
+        newTitle.trim(),
+        newDifficulty,
+        newDescription.trim() || undefined,
+        newProgressMax > 0 ? newProgressMax : undefined
+      );
       setNewTitle("");
+      setNewDescription("");
       setNewDifficulty("easy");
+      setNewProgressMax(0);
       setShowCreateForm(false);
       // Refetch after creation
       const { data: achRows } = await supabase
@@ -221,14 +239,23 @@ export default function GameDetailPage() {
   const startEdit = (ach: Achievement) => {
     setEditingId(ach.id);
     setEditTitle(ach.title);
+    setEditDescription(ach.description);
   };
 
   const saveEdit = async () => {
-    if (!editingId || !editTitle.trim()) return;
+    if (!editingId) return;
     try {
-      await updateAchievementTitle(editingId, gameId, editTitle.trim());
+      if (editTitle.trim()) {
+        await updateAchievementTitle(editingId, gameId, editTitle.trim());
+      }
+      await updateAchievementDescription(
+        editingId,
+        gameId,
+        editDescription.trim()
+      );
       setEditingId(null);
       setEditTitle("");
+      setEditDescription("");
       // Refetch
       const { data: achRows } = await supabase
         .from("achievements")
@@ -244,6 +271,7 @@ export default function GameDetailPage() {
   const cancelEdit = () => {
     setEditingId(null);
     setEditTitle("");
+    setEditDescription("");
   };
 
   if (loading) {
@@ -399,7 +427,14 @@ export default function GameDetailPage() {
                 if (e.key === "Escape") setShowCreateForm(false);
               }}
             />
-            <div className="flex items-center gap-2">
+            <textarea
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="Optional description…"
+              rows={2}
+              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
+            />
+            <div className="flex items-center gap-3 flex-wrap">
               <select
                 value={newDifficulty}
                 onChange={(e) =>
@@ -411,6 +446,21 @@ export default function GameDetailPage() {
                 <option value="medium">Medium (10★)</option>
                 <option value="hard">Hard (20★)</option>
               </select>
+              <label className="flex items-center gap-2 text-xs text-text-secondary">
+                Progress:
+                <input
+                  type="number"
+                  min={0}
+                  max={999}
+                  value={newProgressMax}
+                  onChange={(e) =>
+                    setNewProgressMax(Math.max(0, parseInt(e.target.value) || 0))
+                  }
+                  className="w-16 bg-bg-1 border border-border-subtle rounded-lg px-2 py-1.5 text-sm text-text-primary outline-none focus:border-accent transition-colors text-center"
+                  placeholder="0"
+                />
+                <span className="text-text-tertiary text-[10px]">steps</span>
+              </label>
               <button
                 onClick={handleCreate}
                 disabled={creating || !newTitle.trim()}
@@ -457,30 +507,39 @@ export default function GameDetailPage() {
               <div key={ach.id} className="group relative">
                 {editingId === ach.id ? (
                   /* Inline edit */
-                  <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3">
-                    <input
-                      ref={editInputRef}
-                      type="text"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveEdit();
-                        if (e.key === "Escape") cancelEdit();
-                      }}
+                  <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <input
+                        ref={editInputRef}
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveEdit();
+                          if (e.key === "Escape") cancelEdit();
+                        }}
+                      />
+                      <button
+                        onClick={saveEdit}
+                        className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Description…"
+                      rows={2}
+                      className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none"
                     />
-                    <button
-                      onClick={saveEdit}
-                      className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={cancelEdit}
-                      className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
-                    >
-                      Cancel
-                    </button>
                   </div>
                 ) : (
                   /* Normal row with hover actions */
@@ -494,7 +553,7 @@ export default function GameDetailPage() {
                       <button
                         onClick={() => startEdit(ach)}
                         className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-xs"
-                        title="Edit title"
+                        title="Edit"
                       >
                         ✎
                       </button>
