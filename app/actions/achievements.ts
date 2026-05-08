@@ -4,9 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 const STAR_MAP = {
-  easy: 5,
-  medium: 10,
-  hard: 20,
+  easy: 1,
+  medium: 3,
+  hard: 5,
 } as const;
 
 export type Difficulty = "easy" | "medium" | "hard";

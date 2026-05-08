@@ -459,9 +459,9 @@ export default function GameDetailPage() {
                 }
                 className="bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
               >
-                <option value="easy">Easy (5★)</option>
-                <option value="medium">Medium (10★)</option>
-                <option value="hard">Hard (20★)</option>
+                <option value="easy">Easy (1★)</option>
+                <option value="medium">Medium (3★)</option>
+                <option value="hard">Hard (5★)</option>
               </select>
               <label className="flex items-center gap-2 text-xs text-text-secondary">
                 Progress:
