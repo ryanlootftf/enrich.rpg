@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { gameFromRow, type GameRow } from "@/lib/db-helpers";
 import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
@@ -9,6 +9,12 @@ import { AchievementItem } from "@/components/achievements/achievement-item";
 import { RewardItem } from "@/components/rewards/reward-item";
 import { AIModal } from "@/components/ai/ai-modal";
 import { mockAIResults } from "@/app/mock-data";
+import {
+  createAchievement,
+  deleteAchievement,
+  updateAchievementTitle,
+  type Difficulty,
+} from "@/app/actions/achievements";
 
 const themeGradients: Record<string, string> = {
   purple: "from-[#7c6aff] to-[#a08bff]",
@@ -74,6 +80,20 @@ export default function GameDetailPage() {
   const [filter, setFilter] = useState<FilterDifficulty>("all");
   const [aiOpen, setAiOpen] = useState(false);
 
+  // Create form state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDifficulty, setNewDifficulty] = useState<Difficulty>("easy");
+  const [creating, setCreating] = useState(false);
+
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  // Refs for focus management
+  const createInputRef = useRef<HTMLInputElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
+
   // Fetch game + achievements + rewards from Supabase
   useEffect(() => {
     async function load() {
@@ -99,7 +119,9 @@ export default function GameDetailPage() {
         .eq("game_id", gameId)
         .order("created_at", { ascending: true });
 
-      const achs = (achRows ?? []).map((r: AchievementRow) => achievementFromRow(r));
+      const achs = (achRows ?? []).map((r: AchievementRow) =>
+        achievementFromRow(r)
+      );
       setAchievements(achs);
 
       // Fetch rewards
@@ -118,6 +140,19 @@ export default function GameDetailPage() {
 
     load();
   }, [gameId, supabase]);
+
+  // Focus management
+  useEffect(() => {
+    if (showCreateForm && createInputRef.current) {
+      createInputRef.current.focus();
+    }
+  }, [showCreateForm]);
+
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      editInputRef.current.focus();
+    }
+  }, [editingId]);
 
   const toggleAchievement = async (id: string) => {
     // Optimistic update
@@ -143,6 +178,72 @@ export default function GameDetailPage() {
       setAchievements(prev);
       console.error("Failed to toggle achievement:", error.message);
     }
+  };
+
+  const handleCreate = async () => {
+    if (!newTitle.trim()) return;
+    setCreating(true);
+    try {
+      await createAchievement(gameId, newTitle.trim(), newDifficulty);
+      setNewTitle("");
+      setNewDifficulty("easy");
+      setShowCreateForm(false);
+      // Refetch after creation
+      const { data: achRows } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: true });
+      setAchievements((achRows ?? []).map((r: AchievementRow) => achievementFromRow(r)));
+    } catch (e) {
+      console.error("Failed to create achievement:", e);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this quest?")) return;
+    try {
+      await deleteAchievement(id, gameId);
+      // Refetch
+      const { data: achRows } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: true });
+      setAchievements((achRows ?? []).map((r: AchievementRow) => achievementFromRow(r)));
+    } catch (e) {
+      console.error("Failed to delete achievement:", e);
+    }
+  };
+
+  const startEdit = (ach: Achievement) => {
+    setEditingId(ach.id);
+    setEditTitle(ach.title);
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !editTitle.trim()) return;
+    try {
+      await updateAchievementTitle(editingId, gameId, editTitle.trim());
+      setEditingId(null);
+      setEditTitle("");
+      // Refetch
+      const { data: achRows } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: true });
+      setAchievements((achRows ?? []).map((r: AchievementRow) => achievementFromRow(r)));
+    } catch (e) {
+      console.error("Failed to update achievement:", e);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditTitle("");
   };
 
   if (loading) {
@@ -264,13 +365,68 @@ export default function GameDetailPage() {
       <section className="screen">
         <div className="flex items-center justify-between mb-4">
           <h2 className="section-label mb-0">Quests</h2>
-          <button
-            onClick={() => setAiOpen(true)}
-            className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
-          >
-            ✦ AI Coach
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setShowCreateForm(true);
+                setAiOpen(false);
+              }}
+              className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
+            >
+              ＋ New Quest
+            </button>
+            <button
+              onClick={() => setAiOpen(true)}
+              className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
+            >
+              ✦ AI Coach
+            </button>
+          </div>
         </div>
+
+        {/* Create form */}
+        {showCreateForm && (
+          <div className="bg-bg-2 border border-border-subtle rounded-xl p-4 mb-4 space-y-3">
+            <input
+              ref={createInputRef}
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Quest title…"
+              className="w-full bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleCreate();
+                if (e.key === "Escape") setShowCreateForm(false);
+              }}
+            />
+            <div className="flex items-center gap-2">
+              <select
+                value={newDifficulty}
+                onChange={(e) =>
+                  setNewDifficulty(e.target.value as Difficulty)
+                }
+                className="bg-bg-1 border border-border-subtle rounded-lg px-3 py-2 text-sm text-text-primary outline-none focus:border-accent transition-colors"
+              >
+                <option value="easy">Easy (5★)</option>
+                <option value="medium">Medium (10★)</option>
+                <option value="hard">Hard (20★)</option>
+              </select>
+              <button
+                onClick={handleCreate}
+                disabled={creating || !newTitle.trim()}
+                className="bg-accent text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {creating ? "Adding…" : "Add Quest"}
+              </button>
+              <button
+                onClick={() => setShowCreateForm(false)}
+                className="text-text-tertiary text-xs hover:text-text-secondary transition-colors px-2 py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Filter tabs */}
         <div className="flex gap-2 mb-4">
@@ -293,16 +449,66 @@ export default function GameDetailPage() {
           {filteredAchievements.length === 0 ? (
             <p className="text-text-tertiary text-xs py-6 text-center">
               {achievements.length === 0
-                ? "No quests yet. Use the AI Coach to generate some!"
+                ? "No quests yet. Add one with ＋ New Quest or use the AI Coach!"
                 : "No quests for this filter."}
             </p>
           ) : (
             filteredAchievements.map((ach) => (
-              <AchievementItem
-                key={ach.id}
-                achievement={ach}
-                onToggle={toggleAchievement}
-              />
+              <div key={ach.id} className="group relative">
+                {editingId === ach.id ? (
+                  /* Inline edit */
+                  <div className="bg-bg-2 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3">
+                    <input
+                      ref={editInputRef}
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="flex-1 bg-bg-1 border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit();
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                    />
+                    <button
+                      onClick={saveEdit}
+                      className="text-xs text-accent-2 hover:text-accent font-medium transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  /* Normal row with hover actions */
+                  <div className="relative">
+                    <AchievementItem
+                      achievement={ach}
+                      onToggle={toggleAchievement}
+                    />
+                    {/* Hover actions */}
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => startEdit(ach)}
+                        className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-text-primary hover:bg-bg-1 transition-colors text-xs"
+                        title="Edit title"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => handleDelete(ach.id)}
+                        className="w-7 h-7 flex items-center justify-center rounded-md text-text-tertiary hover:text-coral hover:bg-bg-1 transition-colors text-xs"
+                        title="Delete"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))
           )}
         </div>
