@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { gameFromRow, type GameRow } from "@/lib/db-helpers";
 import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
 import { AchievementItem } from "@/components/achievements/achievement-item";
-import { RewardItem } from "@/components/rewards/reward-item";
+import { RewardEditor } from "@/components/rewards/reward-editor";
 import { AIModal } from "@/components/ai/ai-modal";
 import { mockAIResults } from "@/app/mock-data";
 import {
@@ -80,8 +80,7 @@ export default function GameDetailPage() {
 
   const [game, setGame] = useState<Game | null | undefined>(undefined);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [mainRewards, setMainRewards] = useState<Reward[]>([]);
-  const [bonusRewards, setBonusRewards] = useState<Reward[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterDifficulty>("all");
   const [aiOpen, setAiOpen] = useState(false);
@@ -138,8 +137,7 @@ export default function GameDetailPage() {
         .order("required_stars", { ascending: true });
 
       const allRewards = (rewRows ?? []).map((r: RewardRow) => rewardFromRow(r));
-      setMainRewards(allRewards.filter((r) => r.type === "MAIN_TRACK"));
-      setBonusRewards(allRewards.filter((r) => r.type === "BONUS_TRACK"));
+      setRewards(allRewards);
 
       setLoading(false);
     }
@@ -585,29 +583,14 @@ export default function GameDetailPage() {
         )}
       </section>
 
-        {/* Rewards — Main Track */}
-        {mainRewards.length > 0 && (
-          <section className="screen">
-            <h2 className="section-label">Main Track Rewards</h2>
-            <div className="flex flex-col gap-2.5">
-              {mainRewards.map((reward) => (
-                <RewardItem key={reward.id} reward={reward} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Rewards — Bonus Track */}
-        {bonusRewards.length > 0 && (
-          <section className="screen">
-            <div className="divider-label">Bonus Track Rewards</div>
-            <div className="flex flex-col gap-2.5">
-              {bonusRewards.map((reward) => (
-                <RewardItem key={reward.id} reward={reward} />
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Rewards — Editable Setup */}
+        <RewardEditor
+          game={game}
+          mainRewards={rewards.filter((r) => r.type === "MAIN_TRACK")}
+          bonusRewards={rewards.filter((r) => r.type === "BONUS_TRACK" && r.requiredStars > 0)}
+          bonusTemplate={rewards.find((r) => r.type === "BONUS_TRACK" && r.requiredStars === 0) ?? null}
+          lifetimeStars={totalStarsEarned}
+        />
       </div>
 
       {/* AI Modal — outside card */}
