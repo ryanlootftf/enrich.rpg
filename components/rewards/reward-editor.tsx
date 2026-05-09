@@ -16,9 +16,10 @@ interface Props {
   bonusRewards: Reward[]; // claimable bonus rewards (NOT the template)
   bonusTemplate: Reward | null; // the single BONUS_TRACK template
   lifetimeStars: number;
+  onRewardsChanged: () => Promise<void>;
 }
 
-export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, lifetimeStars }: Props) {
+export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, lifetimeStars, onRewardsChanged }: Props) {
   return (
     <section className="space-y-8">
       <h2 className="section-label">Rewards</h2>
@@ -40,6 +41,7 @@ export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, l
                 isFinal={stars === 100}
                 lifetimeStars={lifetimeStars}
                 type="MAIN_TRACK"
+                onRewardsChanged={onRewardsChanged}
               />
             );
           })}
@@ -60,6 +62,7 @@ export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, l
           isFinal={false}
           lifetimeStars={lifetimeStars}
           type="BONUS_TRACK"
+          onRewardsChanged={onRewardsChanged}
         />
 
         {/* Claimable bonus rewards (generated from template) */}
@@ -70,6 +73,7 @@ export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, l
                 key={reward.id}
                 reward={reward}
                 gameId={game.id}
+                onRewardsChanged={onRewardsChanged}
               />
             ))}
           </div>
@@ -87,6 +91,7 @@ function MilestoneSlot({
   isFinal,
   lifetimeStars,
   type,
+  onRewardsChanged,
 }: {
   gameId: string;
   requiredStars: number;
@@ -94,6 +99,7 @@ function MilestoneSlot({
   isFinal: boolean;
   lifetimeStars: number;
   type: "MAIN_TRACK" | "BONUS_TRACK";
+  onRewardsChanged: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(existingReward?.title ?? "");
@@ -132,6 +138,7 @@ function MilestoneSlot({
     setSaving(true);
     try {
       await upsertReward(gameId, requiredStars, title.trim(), emoji, type, isFinal);
+      await onRewardsChanged();
       setEditing(false);
     } catch (e) {
       console.error("Failed to save reward:", e);
@@ -144,6 +151,7 @@ function MilestoneSlot({
     if (!existingReward) return;
     try {
       await claimReward(existingReward.id, gameId);
+      await onRewardsChanged();
     } catch (e) {
       console.error("Failed to claim reward:", e);
     }
@@ -283,12 +291,13 @@ function MilestoneSlot({
 }
 
 /** A generated claimable bonus reward card */
-function ClaimableBonusCard({ reward, gameId }: { reward: Reward; gameId: string }) {
+function ClaimableBonusCard({ reward, gameId, onRewardsChanged }: { reward: Reward; gameId: string; onRewardsChanged: () => Promise<void> }) {
   const claimed = reward.claimed;
 
   const handleClaim = async () => {
     try {
       await claimReward(reward.id, gameId);
+      await onRewardsChanged();
     } catch (e) {
       console.error("Failed to claim bonus reward:", e);
     }

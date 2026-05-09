@@ -11,6 +11,7 @@ interface Props {
   bonusRewards: Reward[];
   bonusTemplate: Reward | null;
   lifetimeStars: number;
+  onRewardsChanged: () => Promise<void>;
 }
 
 export function RewardModal({
@@ -21,6 +22,7 @@ export function RewardModal({
   bonusRewards,
   bonusTemplate,
   lifetimeStars,
+  onRewardsChanged,
 }: Props) {
   if (!isOpen) return null;
 
@@ -63,6 +65,7 @@ export function RewardModal({
             bonusRewards={bonusRewards}
             bonusTemplate={bonusTemplate}
             lifetimeStars={lifetimeStars}
+            onRewardsChanged={onRewardsChanged}
           />
         </div>
       </div>

@@ -100,6 +100,18 @@ export default function GameDetailPage() {
   // Refs for focus management
   const createInputRef = useRef<HTMLInputElement>(null);
 
+  // Reusable reward fetcher — called on initial load and after claim/upsert
+  async function fetchRewards() {
+    const { data: rewRows } = await supabase
+      .from("rewards")
+      .select("*")
+      .eq("game_id", gameId)
+      .order("required_stars", { ascending: true });
+
+    const allRewards = (rewRows ?? []).map((r: RewardRow) => rewardFromRow(r));
+    setRewards(allRewards);
+  }
+
   // Fetch game + achievements + rewards from Supabase
   useEffect(() => {
     async function load() {
@@ -131,14 +143,7 @@ export default function GameDetailPage() {
       setAchievements(achs);
 
       // Fetch rewards
-      const { data: rewRows } = await supabase
-        .from("rewards")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("required_stars", { ascending: true });
-
-      const allRewards = (rewRows ?? []).map((r: RewardRow) => rewardFromRow(r));
-      setRewards(allRewards);
+      await fetchRewards();
 
       setLoading(false);
     }
@@ -611,6 +616,7 @@ export default function GameDetailPage() {
         bonusRewards={rewards.filter((r) => r.type === "BONUS_TRACK" && r.requiredStars > 0)}
         bonusTemplate={rewards.find((r) => r.type === "BONUS_TRACK" && r.requiredStars === 0) ?? null}
         lifetimeStars={totalStarsEarned}
+        onRewardsChanged={fetchRewards}
       />
 
       {/* Quest Detail Modal — outside card */}
