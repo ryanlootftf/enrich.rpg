@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { gameFromRow, type GameRow } from "@/lib/db-helpers";
 import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
 import { AchievementItem } from "@/components/achievements/achievement-item";
-import { RewardEditor } from "@/components/rewards/reward-editor";
+import { RewardModal } from "@/components/rewards/reward-modal";
 import { AIModal } from "@/components/ai/ai-modal";
 import { mockAIResults } from "@/app/mock-data";
 import {
@@ -84,6 +84,7 @@ export default function GameDetailPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterDifficulty>("all");
   const [aiOpen, setAiOpen] = useState(false);
+  const [rewardModalOpen, setRewardModalOpen] = useState(false);
 
   // Create form state
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -351,6 +352,14 @@ export default function GameDetailPage() {
                 style={{ width: `${progress}%` }}
               />
             </div>
+
+            {/* Set Rewards button */}
+            <button
+              onClick={() => setRewardModalOpen(true)}
+              className="mt-5 text-[11px] font-medium text-gold hover:text-gold-2 transition-colors flex items-center gap-1"
+            >
+              🎁 Set Rewards
+            </button>
           </>
         )}
       </section>
@@ -583,14 +592,6 @@ export default function GameDetailPage() {
         )}
       </section>
 
-        {/* Rewards — Editable Setup */}
-        <RewardEditor
-          game={game}
-          mainRewards={rewards.filter((r) => r.type === "MAIN_TRACK")}
-          bonusRewards={rewards.filter((r) => r.type === "BONUS_TRACK" && r.requiredStars > 0)}
-          bonusTemplate={rewards.find((r) => r.type === "BONUS_TRACK" && r.requiredStars === 0) ?? null}
-          lifetimeStars={totalStarsEarned}
-        />
       </div>
 
       {/* AI Modal — outside card */}
@@ -599,6 +600,17 @@ export default function GameDetailPage() {
         onClose={() => setAiOpen(false)}
         gameTitle={game.title}
         results={mockAIResults}
+      />
+
+      {/* Reward Modal */}
+      <RewardModal
+        isOpen={rewardModalOpen}
+        onClose={() => setRewardModalOpen(false)}
+        game={game}
+        mainRewards={rewards.filter((r) => r.type === "MAIN_TRACK")}
+        bonusRewards={rewards.filter((r) => r.type === "BONUS_TRACK" && r.requiredStars > 0)}
+        bonusTemplate={rewards.find((r) => r.type === "BONUS_TRACK" && r.requiredStars === 0) ?? null}
+        lifetimeStars={totalStarsEarned}
       />
 
       {/* Quest Detail Modal — outside card */}
