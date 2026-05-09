@@ -218,7 +218,7 @@ export default function GameDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="bg-bg-2 border border-border-subtle rounded-2xl min-h-screen flex items-center justify-center">
         <div className="text-text-tertiary text-sm animate-pulse">Loading…</div>
       </div>
     );
@@ -226,7 +226,7 @@ export default function GameDetailPage() {
 
   if (!game) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <div className="bg-bg-2 border border-border-subtle rounded-2xl min-h-screen flex flex-col items-center justify-center gap-4">
         <div className="text-6xl">🎮</div>
         <h1 className="text-xl font-syne font-semibold text-text-primary">
           Game not found
@@ -264,17 +264,19 @@ export default function GameDetailPage() {
       : 0;
 
   return (
-    <div className="space-y-10 pb-16">
-      {/* Back link */}
+    <>
+      {/* Back link - outside card */}
       <button
         onClick={() => router.push("/dashboard")}
-        className="text-text-tertiary text-xs hover:text-text-primary transition-colors flex items-center gap-1"
+        className="text-text-tertiary text-xs hover:text-text-primary transition-colors flex items-center gap-1 mb-4"
       >
         ← Back to all quests
       </button>
 
-      {/* Hero header */}
-      <section>
+      {/* Card wrapping entire page content */}
+      <div className="bg-bg-2 border border-border-subtle rounded-2xl p-6 min-h-[calc(100vh-6rem)] space-y-10">
+        {/* Hero header */}
+        <section>
         <div
           className={`h-[3px] w-full rounded-full mb-6 bg-gradient-to-r ${
             themeGradients[game.theme]
@@ -583,31 +585,32 @@ export default function GameDetailPage() {
         )}
       </section>
 
-      {/* Rewards — Main Track */}
-      {mainRewards.length > 0 && (
-        <section className="screen">
-          <h2 className="section-label">Main Track Rewards</h2>
-          <div className="flex flex-col gap-2.5">
-            {mainRewards.map((reward) => (
-              <RewardItem key={reward.id} reward={reward} />
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Rewards — Main Track */}
+        {mainRewards.length > 0 && (
+          <section className="screen">
+            <h2 className="section-label">Main Track Rewards</h2>
+            <div className="flex flex-col gap-2.5">
+              {mainRewards.map((reward) => (
+                <RewardItem key={reward.id} reward={reward} />
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Rewards — Bonus Track */}
-      {bonusRewards.length > 0 && (
-        <section className="screen">
-          <div className="divider-label">Bonus Track Rewards</div>
-          <div className="flex flex-col gap-2.5">
-            {bonusRewards.map((reward) => (
-              <RewardItem key={reward.id} reward={reward} />
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Rewards — Bonus Track */}
+        {bonusRewards.length > 0 && (
+          <section className="screen">
+            <div className="divider-label">Bonus Track Rewards</div>
+            <div className="flex flex-col gap-2.5">
+              {bonusRewards.map((reward) => (
+                <RewardItem key={reward.id} reward={reward} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
 
-      {/* AI Modal */}
+      {/* AI Modal — outside card */}
       <AIModal
         isOpen={aiOpen}
         onClose={() => setAiOpen(false)}
@@ -615,7 +618,7 @@ export default function GameDetailPage() {
         results={mockAIResults}
       />
 
-      {/* Quest Detail Modal */}
+      {/* Quest Detail Modal — outside card */}
       {selectedQuest && (
         <QuestDetailModal
           achievement={selectedQuest}
@@ -625,6 +628,6 @@ export default function GameDetailPage() {
           onDelete={handleQuestDelete}
         />
       )}
-    </div>
+    </>
   );
 }
