@@ -72,7 +72,27 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
 
         {/* Loading skeleton */}
         {loading && resultsState.length === 0 && (
-          <div className="px-5 flex flex-col gap-2 overflow-y-auto pb-2">
+          <div className="px-5 flex flex-col gap-3 overflow-y-auto pb-2">
+            {/* Animated generating indicator */}
+            <div className="bg-bg-3 border border-border-subtle rounded-xl px-4 py-3 flex items-center gap-3">
+              <span className="text-lg animate-spin">🧙</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[13px] font-medium text-text-primary">
+                  Generating quests
+                  <span className="inline-block w-[3ch] text-left animate-pulse">
+                    ...
+                  </span>
+                </div>
+                <div className="text-[11px] text-text-tertiary">
+                  AI is crafting quests for your game
+                </div>
+              </div>
+            </div>
+            {/* Shimmer progress bar */}
+            <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden">
+<div className="h-full w-2/3 bg-gradient-to-r from-accent/40 via-accent to-accent/40 rounded-full animate-pulse" />
+            </div>
+            {/* Skeleton cards as visual filler */}
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -148,23 +168,38 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-border-subtle flex items-center justify-between">
-          <div className="text-xs text-text-secondary">
-            <span className="text-text-primary font-medium">
-              {selectedCount}
-            </span>{" "}
-            selected ·{" "}
-            <span className="text-gold font-medium">+{totalStars}/100 ★</span>
+        {/* Footer — loading state */}
+        {loading && resultsState.length === 0 ? (
+          <div className="px-5 py-4 border-t border-border-subtle flex items-center justify-between">
+            <div className="text-xs text-text-tertiary animate-pulse">
+              Waiting for AI response…
+            </div>
+            <button
+              onClick={onClose}
+              className="text-[13px] font-medium px-5 py-2 rounded-lg border border-border-default text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors"
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            onClick={() => onAddQuests?.(resultsState)}
-            disabled={selectedCount === 0}
-            className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Add to quests
-          </button>
-        </div>
+        ) : (
+          /* Footer — results state */
+          <div className="px-5 py-4 border-t border-border-subtle flex items-center justify-between">
+            <div className="text-xs text-text-secondary">
+              <span className="text-text-primary font-medium">
+                {selectedCount}
+              </span>{" "}
+              selected ·{" "}
+              <span className="text-gold font-medium">+{totalStars}/100 ★</span>
+            </div>
+            <button
+              onClick={() => onAddQuests?.(resultsState)}
+              disabled={selectedCount === 0}
+              className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Add to quests
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

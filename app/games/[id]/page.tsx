@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { gameFromRow, type GameRow } from "@/lib/db-helpers";
 import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
@@ -101,6 +101,7 @@ export default function GameDetailPage() {
 
   // Refs for focus management
   const createInputRef = useRef<HTMLInputElement>(null);
+  const aiAbortRef = useRef<AbortController | null>(null);
 
   // Reusable reward fetcher — called on initial load and after claim/upsert
   async function fetchRewards() {
@@ -222,7 +223,12 @@ export default function GameDetailPage() {
     setSelectedQuest(null);
   };
 
-  const handleAiOpen = async () => {
+  const handleAiOpen = useCallback(async () => {
+    // Abort any previous request
+    aiAbortRef.current?.abort();
+    const controller = new AbortController();
+    aiAbortRef.current = controller;
+
     setAiOpen(true);
     setAiLoading(true);
     setAiResults([]);
@@ -234,6 +240,7 @@ export default function GameDetailPage() {
           title: game?.title ?? "",
           description: game?.description ?? "",
         }),
+        signal: controller.signal,
       });
       const data = await res.json();
       if (data.achievements && Array.isArray(data.achievements)) {
@@ -248,12 +255,15 @@ export default function GameDetailPage() {
           }))
         );
       }
-    } catch (e) {
+    } catch (e: unknown) {
+      if (e instanceof DOMException && e.name === "AbortError") {
+        return; // user cancelled — silent
+      }
       console.error("AI generation failed:", e);
     } finally {
       setAiLoading(false);
     }
-  };
+  }, [game?.title, game?.description]);
 
   const handleAddAiQuests = async (results: AIResult[]) => {
     const selected = results.filter((r) => r.selected);
@@ -662,7 +672,10 @@ export default function GameDetailPage() {
       {/* AI Modal — outside card */}
       <AIModal
         isOpen={aiOpen}
-        onClose={() => setAiOpen(false)}
+        onClose={() => {
+          aiAbortRef.current?.abort();
+          setAiOpen(false);
+        }}
         gameTitle={game.title}
         results={aiResults}
         loading={aiLoading}
