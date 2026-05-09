@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { deleteGame } from "@/app/actions/games";
 import type { Game } from "@/app/types";
 
 const themeGradients: Record<string, string> = {
@@ -27,21 +25,11 @@ const themeIcons: Record<string, string> = {
 };
 
 export function GameCard({ game }: { game: Game }) {
-  const [deleting, setDeleting] = useState(false);
-
   const isEmpty = game.totalPossibleStars === 0;
   const progress = isEmpty ? 0 : Math.round(
     (game.lifetimeStars / game.totalPossibleStars) * 100
   );
   const displayPct = game.isBonus ? "∞" : `${progress}`;
-
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!confirm(`Delete "${game.title}"? This will remove all its quests and rewards.`)) return;
-    setDeleting(true);
-    await deleteGame(game.id);
-  };
 
   return (
     <Link href={`/games/${game.id}`} className="no-underline relative group">
@@ -54,32 +42,6 @@ export function GameCard({ game }: { game: Game }) {
             themeGradients[game.theme]
           }`}
         />
-
-        {/* Delete button — top right corner */}
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-text-tertiary hover:text-red hover:bg-red/10 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-30"
-          title="Delete game"
-        >
-          {deleting ? (
-            <span className="text-[10px] animate-pulse">…</span>
-          ) : (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          )}
-        </button>
 
         {/* Top row: icon + percentage */}
         <div className="flex items-start justify-between mb-[14px]">

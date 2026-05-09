@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { gameFromRow, type GameRow } from "@/lib/db-helpers";
+import { deleteGame } from "@/app/actions/games";
 import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
 import { AchievementItem } from "@/components/achievements/achievement-item";
 import { RewardModal } from "@/components/rewards/reward-modal";
@@ -98,6 +99,7 @@ export default function GameDetailPage() {
 
   // Modal state
   const [selectedQuest, setSelectedQuest] = useState<Achievement | null>(null);
+  const [deletingGame, setDeletingGame] = useState(false);
 
   // Refs for focus management
   const createInputRef = useRef<HTMLInputElement>(null);
@@ -265,6 +267,18 @@ export default function GameDetailPage() {
     }
   }, [game?.title, game?.description]);
 
+  const handleDeleteGame = async () => {
+    if (!game || !confirm(`Delete "${game.title}"? This will remove all its quests and rewards.`)) return;
+    setDeletingGame(true);
+    try {
+      await deleteGame(gameId);
+      router.push("/dashboard");
+    } catch (e) {
+      console.error("Failed to delete game:", e);
+      setDeletingGame(false);
+    }
+  };
+
   const handleAddAiQuests = async (results: AIResult[]) => {
     const selected = results.filter((r) => r.selected);
     if (selected.length === 0) {
@@ -376,10 +390,38 @@ export default function GameDetailPage() {
             themeGradients[game.theme]
           }`}
         />
-        <h1 className="text-2xl font-syne font-bold text-text-primary mb-2">
-          {game.title}
-        </h1>
-        <p className="text-text-secondary text-sm mb-5">{game.description}</p>
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-syne font-bold text-text-primary mb-2">
+              {game.title}
+            </h1>
+            <p className="text-text-secondary text-sm mb-5">{game.description}</p>
+          </div>
+          <button
+            onClick={handleDeleteGame}
+            disabled={deletingGame}
+            className="ml-4 mt-1 w-8 h-8 rounded-lg flex items-center justify-center text-text-tertiary hover:text-red hover:bg-red/10 transition-colors disabled:opacity-30 flex-shrink-0"
+            title="Delete game"
+          >
+            {deletingGame ? (
+              <span className="text-[10px] animate-pulse">…</span>
+            ) : (
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            )}
+          </button>
+        </div>
 
         {achievements.length === 0 ? (
           /* Empty state — no quests yet, clickable to open form */
