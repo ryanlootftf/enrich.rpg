@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Game, Reward } from "@/app/types";
-import { upsertReward, claimReward } from "@/app/actions/rewards";
+import { upsertReward, claimReward, unclaimReward } from "@/app/actions/rewards";
 
 // Emoji quick-pick palette
 const EMOJI_PALETTE = ["🎁", "🍕", "🍦", "🎮", "🎬", "📚", "☕", "🍩", "🎵", "💻", "🏆", "✨", "🔥", "💎", "🌴", "🍹"];
@@ -157,6 +157,16 @@ function MilestoneSlot({
     }
   };
 
+  const handleUnclaim = async () => {
+    if (!existingReward) return;
+    try {
+      await unclaimReward(existingReward.id, gameId);
+      await onRewardsChanged();
+    } catch (e) {
+      console.error("Failed to unclaim reward:", e);
+    }
+  };
+
   const starLabel = isTemplate
     ? `every ${BONUS_INTERVAL} ★`
     : `${requiredStars} ★${isFinal ? " — final reward" : ""}`;
@@ -272,6 +282,14 @@ function MilestoneSlot({
             Claim
           </button>
         )}
+        {claimed && !isTemplate && (
+          <button
+            onClick={handleUnclaim}
+            className="text-[11px] font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
+          >
+            Unclaim
+          </button>
+        )}
         <button
           onClick={() => setEditing(true)}
           className="text-[11px] font-medium text-text-tertiary hover:text-text-secondary transition-colors px-2 py-1"
@@ -303,6 +321,15 @@ function ClaimableBonusCard({ reward, gameId, onRewardsChanged }: { reward: Rewa
     }
   };
 
+  const handleUnclaim = async () => {
+    try {
+      await unclaimReward(reward.id, gameId);
+      await onRewardsChanged();
+    } catch (e) {
+      console.error("Failed to unclaim bonus reward:", e);
+    }
+  };
+
   return (
     <div
       className={`bg-gold/5 border border-gold/30 rounded-xl px-5 py-4 flex items-center gap-3 shadow-sm hover:shadow-md transition-all duration-200 ${
@@ -316,18 +343,28 @@ function ClaimableBonusCard({ reward, gameId, onRewardsChanged }: { reward: Rewa
         <div className="text-sm font-semibold text-text-primary">{reward.title}</div>
         <div className="text-[11px] text-zinc-500 mt-0">at {reward.requiredStars} ★ — bonus reward</div>
       </div>
-      {!claimed ? (
-        <button
-          onClick={handleClaim}
-          className="text-[11px] font-medium text-gold-2 hover:text-gold transition-colors px-2 py-1"
-        >
-          Claim
-        </button>
-      ) : (
-        <span className="text-[11px] px-[10px] py-0.5 rounded-full font-medium bg-green/10 text-green">
-          Claimed
-        </span>
-      )}
+      <div className="flex items-center gap-1.5">
+        {!claimed ? (
+          <button
+            onClick={handleClaim}
+            className="text-[11px] font-medium text-gold-2 hover:text-gold transition-colors px-2 py-1"
+          >
+            Claim
+          </button>
+        ) : (
+          <button
+            onClick={handleUnclaim}
+            className="text-[11px] font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
+          >
+            Unclaim
+          </button>
+        )}
+        {claimed && (
+          <span className="text-[11px] px-[10px] py-0.5 rounded-full font-medium bg-green/10 text-green">
+            Claimed
+          </span>
+        )}
+      </div>
     </div>
   );
 }

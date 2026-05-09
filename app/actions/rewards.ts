@@ -72,6 +72,22 @@ export async function claimReward(id: string, gameId: string) {
 }
 
 /**
+ * Unclaim a reward — flips claimed back to false.
+ */
+export async function unclaimReward(id: string, gameId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("rewards")
+    .update({ claimed: false })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/games/${gameId}`);
+}
+
+/**
  * Delete a reward by id.
  */
 export async function deleteReward(id: string, gameId: string) {
