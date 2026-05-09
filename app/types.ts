@@ -42,5 +42,6 @@ export interface AIResult {
   description: string;
   difficulty: Difficulty;
   starsRewarded: number;
+  progressMax: number;
   selected: boolean;
 }

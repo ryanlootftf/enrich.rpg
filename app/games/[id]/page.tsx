@@ -230,7 +230,10 @@ export default function GameDetailPage() {
       const res = await fetch("/api/generate-achievements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: game?.title ?? "" }),
+        body: JSON.stringify({
+          title: game?.title ?? "",
+          description: game?.description ?? "",
+        }),
       });
       const data = await res.json();
       if (data.achievements && Array.isArray(data.achievements)) {
@@ -239,7 +242,8 @@ export default function GameDetailPage() {
             title: String(a.title ?? ""),
             description: String(a.description ?? ""),
             difficulty: a.difficulty as AIResult["difficulty"],
-            starsRewarded: Number(a.stars_rewarded ?? 5),
+            starsRewarded: Number(a.stars_rewarded ?? 1),
+            progressMax: Number(a.progress_max ?? 1),
             selected: true,
           }))
         );
@@ -260,7 +264,7 @@ export default function GameDetailPage() {
           r.title,
           r.difficulty,
           r.description || undefined,
-          0
+          r.progressMax || 1
         );
       } catch (e) {
         console.error("Failed to add AI quest:", e);
@@ -443,7 +447,7 @@ export default function GameDetailPage() {
               onClick={handleAiOpen}
               className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
             >
-              ✦ AI Coach
+              ✦ AI Generate
             </button>
           </div>
         </div>
@@ -636,7 +640,7 @@ export default function GameDetailPage() {
               {filteredAchievements.length === 0 ? (
                 <p className="text-text-tertiary text-xs py-6 text-center">
                   {achievements.length === 0
-                    ? "No quests yet. Add one with ＋ New Quest or use the AI Coach!"
+                    ? "No quests yet. Add one with ＋ New Quest or use AI Generate!"
                     : "No quests for this filter."}
                 </p>
               ) : (

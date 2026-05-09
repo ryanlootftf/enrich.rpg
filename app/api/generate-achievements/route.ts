@@ -7,27 +7,59 @@ const nim = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { goal } = await req.json();
+    const { title, description } = await req.json();
 
-    if (!goal || typeof goal !== "string") {
-      return Response.json({ error: "Goal is required" }, { status: 400 });
+    if (!title || typeof title !== "string") {
+      return Response.json({ error: "Title is required" }, { status: 400 });
     }
 
+    const prompt = [
+      title,
+      description ? `Description: ${description}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     const completion = await nim.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct",
+      model: "minimaxai/minimax-m2.7",
       messages: [
         {
           role: "system",
-          content: `You are an achievement generator for a self-improvement app.
-Given a user goal, return exactly 6 achievements in JSON format:
-2 easy (5 stars), 2 medium (10 stars), 2 hard (20 stars).
-Return ONLY a JSON array, no explanation.
-Format: [{ "title": string, "difficulty": "easy"|"medium"|"hard", "stars_rewarded": number }]`,
+          content: `You are a quest generator for a self-improvement RPG app.
+Given the user's game title and description, generate enough quests to total approximately 100 stars.
+
+Star values by difficulty:
+- easy = 1 star
+- medium = 3 stars
+- hard = 5 stars
+
+Create a realistic mix of easy, medium, and hard quests that feel achievable and specific to the user's goal. The total sum of (stars_rewarded across all quests) should be around 100.
+
+Each quest must include a "progress_max" field — the number of repetitions/steps needed to complete the quest. This should match the nature of the task:
+- "Eat 3 meals" → progress_max: 3
+- "Read 5 books" → progress_max: 5
+- "Exercise 10 times" → progress_max: 10
+- "Drink 8 glasses of water" → progress_max: 8
+- "Meet 1 person" → progress_max: 1
+
+Return ONLY a JSON array, no explanation. Format:
+[
+  {
+    "title": "quest title",
+    "description": "actionable description of the quest",
+    "difficulty": "easy" | "medium" | "hard",
+    "stars_rewarded": 1 | 3 | 5,
+    "progress_max": number
+  }
+]
+
+Make descriptions specific, actionable, and encouraging. They should give the user a clear idea of what to do.`,
         },
-        { role: "user", content: `Goal: ${goal}` },
+        { role: "user", content: `Goal: ${prompt}` },
       ],
-      temperature: 0.7,
-      max_tokens: 500,
+      temperature: 1,
+      top_p: 0.95,
+      max_tokens: 8192,
     });
 
     const raw = completion.choices[0]?.message?.content;

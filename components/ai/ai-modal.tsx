@@ -51,7 +51,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <div>
             <span className="text-accent-2 text-[11px] font-syne uppercase tracking-[0.18em]">
-              AI Suggestions
+              AI Generate
             </span>
             <h2 className="text-bg? text-text-primary text-lg font-syne font-semibold mt-0.5">
               {gameTitle}
@@ -66,8 +66,8 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
         </div>
 
         <p className="px-5 text-xs text-text-tertiary mb-3">
-          AI generates quest ideas based on your goal. Toggle to accept the
-          challenges you want.
+          AI generates quests based on your game. Toggle to select the ones you
+          want, then confirm to add them. Total stars target: ~100 ★.
         </p>
 
         {/* Loading skeleton */}
@@ -123,15 +123,22 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
                     <div className="text-[13px] font-medium text-text-primary">
                       {result.title}
                     </div>
-                    {result.description && (
+                  {result.description && (
                       <div className="text-[11px] text-text-tertiary mt-0.5 leading-snug truncate">
                         {result.description}
                       </div>
                     )}
-                    <span className="text-[11px] text-text-tertiary mt-0.5 inline-flex items-center gap-1">
-                      {diffConfig[result.difficulty]?.icon}{" "}
-                      {diffConfig[result.difficulty]?.label}
-                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[11px] text-text-tertiary inline-flex items-center gap-1">
+                        {diffConfig[result.difficulty]?.icon}{" "}
+                        {diffConfig[result.difficulty]?.label}
+                      </span>
+                      {result.progressMax > 1 && (
+                        <span className="text-[11px] text-text-tertiary">
+                          {result.progressMax} steps
+                        </span>
+                      )}
+                    </div>
                   </div>
 
               <div className="text-xs text-gold font-medium whitespace-nowrap">
@@ -148,7 +155,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
               {selectedCount}
             </span>{" "}
             selected ·{" "}
-            <span className="text-gold font-medium">+{totalStars} ★</span>
+            <span className="text-gold font-medium">+{totalStars}/100 ★</span>
           </div>
           <button
             onClick={() => onAddQuests?.(resultsState)}
