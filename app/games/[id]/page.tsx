@@ -267,6 +267,13 @@ export default function GameDetailPage() {
 
   const handleAddAiQuests = async (results: AIResult[]) => {
     const selected = results.filter((r) => r.selected);
+    if (selected.length === 0) {
+      throw new Error("No quests selected to add.");
+    }
+
+    const failures: string[] = [];
+    let addedCount = 0;
+
     for (const r of selected) {
       try {
         await createAchievement(
@@ -276,10 +283,23 @@ export default function GameDetailPage() {
           r.description || undefined,
           r.progressMax || 1
         );
+        addedCount++;
       } catch (e) {
+        const msg = e instanceof Error ? e.message : "Unknown error";
         console.error("Failed to add AI quest:", e);
+        failures.push(`${r.title}: ${msg}`);
       }
     }
+
+    // If all failed, throw an error so the modal can display it
+    if (addedCount === 0) {
+      throw new Error(
+        failures.length > 0
+          ? `Failed to add ${failures.length} quest${failures.length > 1 ? "s" : ""}. ${failures[0]}`
+          : "Failed to add quests. Please try again."
+      );
+    }
+
     // Refetch achievements
     const { data: achRows } = await supabase
       .from("achievements")

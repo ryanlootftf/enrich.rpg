@@ -15,14 +15,30 @@ interface Props {
   gameTitle: string;
   results: AIResult[];
   loading?: boolean;
-  onAddQuests?: (results: AIResult[]) => void;
+  onAddQuests?: (results: AIResult[]) => Promise<void>;
 }
 
 export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQuests }: Props) {
   const [resultsState, setResultsState] = useState<AIResult[]>(results);
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   useEffect(() => {
     setResultsState(results);
+  }, [results]);
+
+  // Reset adding/error when modal opens/closes or results change
+  useEffect(() => {
+    if (!isOpen) {
+      setAdding(false);
+      setAddError(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (results.length > 0) {
+      setAddError(null);
+    }
   }, [results]);
 
   if (!isOpen) return null;
@@ -183,21 +199,44 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
           </div>
         ) : (
           /* Footer — results state */
-          <div className="px-5 py-4 border-t border-border-subtle flex items-center justify-between">
-            <div className="text-xs text-text-secondary">
-              <span className="text-text-primary font-medium">
-                {selectedCount}
-              </span>{" "}
-              selected ·{" "}
-              <span className="text-gold font-medium">+{totalStars}/100 ★</span>
-            </div>
-            <button
-              onClick={() => onAddQuests?.(resultsState)}
-              disabled={selectedCount === 0}
-              className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          <div className="border-t border-border-subtle">
+            {addError && (
+              <div className="text-[11px] text-coral px-5 pt-3">
+                {addError}
+              </div>
+            )}
+            <div className="px-5 py-4 flex items-center justify-between">
+              <div className="text-xs text-text-secondary">
+                <span className="text-text-primary font-medium">
+                  {selectedCount}
+                </span>{" "}
+                selected ·{" "}
+                <span className="text-gold font-medium">+{totalStars}/100 ★</span>
+              </div>
+              <button
+              onClick={async () => {
+                if (!onAddQuests || adding) return;
+                setAdding(true);
+                setAddError(null);
+                try {
+                  await onAddQuests(resultsState);
+                } catch (e: unknown) {
+                  const msg =
+                    e instanceof Error ? e.message : "Failed to add quests. Please try again.";
+                  setAddError(msg);
+                } finally {
+                  setAdding(false);
+                }
+              }}
+              disabled={selectedCount === 0 || adding}
+              className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
-              Add to quests
-            </button>
+              {adding && (
+                <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              )}
+              {adding ? "Adding to game…" : "Add to quests"}
+              </button>
+            </div>
           </div>
         )}
       </div>
