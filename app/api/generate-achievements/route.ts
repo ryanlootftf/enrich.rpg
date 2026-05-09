@@ -9,7 +9,10 @@ export async function POST(req: Request) {
   try {
     const { title, description } = await req.json();
 
+    console.log("[AI Gen] Request received", { title, hasDescription: !!description });
+
     if (!title || typeof title !== "string") {
+      console.warn("[AI Gen] Rejected — missing title");
       return Response.json({ error: "Title is required" }, { status: 400 });
     }
 
@@ -19,6 +22,13 @@ export async function POST(req: Request) {
     ]
       .filter(Boolean)
       .join("\n");
+
+    console.log("[AI Gen] Sending prompt to NVIDIA NIM", {
+      model: "minimaxai/minimax-m2.7",
+      promptLength: prompt.length,
+    });
+
+    const t0 = Date.now();
 
     const completion = await nim.chat.completions.create({
       model: "minimaxai/minimax-m2.7",
@@ -62,22 +72,42 @@ Make descriptions specific, actionable, and encouraging. They should give the us
       max_tokens: 8192,
     });
 
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+    console.log(`[AI Gen] NVIDIA NIM responded in ${elapsed}s`);
+
     const raw = completion.choices[0]?.message?.content;
     if (!raw) {
+      console.error("[AI Gen] No content in response");
       return Response.json({ error: "No response from AI" }, { status: 500 });
     }
+
+    console.log("[AI Gen] Raw response", {
+      length: raw.length,
+      preview: raw.slice(0, 300),
+    });
 
     // Strip markdown code fences if present
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     const achievements = JSON.parse(cleaned);
 
     if (!Array.isArray(achievements)) {
+      console.error("[AI Gen] Parsed result is not an array", typeof achievements);
       return Response.json({ error: "Invalid AI response format" }, { status: 500 });
     }
 
+    const totalStars = achievements.reduce(
+      (sum: number, a: { stars_rewarded?: number }) => sum + (a.stars_rewarded ?? 0),
+      0,
+    );
+
+    console.log("[AI Gen] ✅ Parsed successfully", {
+      questCount: achievements.length,
+      totalStars,
+    });
+
     return Response.json({ achievements });
   } catch (error) {
-    console.error("AI generation error:", error);
+    console.error("[AI Gen] Fatal error:", error);
     return Response.json(
       { error: "Failed to generate achievements" },
       { status: 500 }
