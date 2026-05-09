@@ -22,8 +22,6 @@ export function NavBar() {
 
   const tabs = [
     { label: "Games", href: "/dashboard" },
-    { label: "Progress", href: "/progress" },
-    { label: "Rewards", href: "/rewards" },
   ];
 
   const handleSignOut = async () => {
@@ -50,10 +48,7 @@ export function NavBar() {
 
       <div className="flex gap-1">
         {tabs.map((tab) => {
-          const isActive =
-            tab.href === "/dashboard"
-              ? pathname === "/dashboard" || pathname.startsWith("/games")
-              : pathname.startsWith(tab.href);
+          const isActive = pathname === "/dashboard" || pathname.startsWith("/games");
 
           return (
             <Link key={tab.href} href={tab.href}>

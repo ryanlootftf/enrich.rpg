@@ -8,7 +8,7 @@ import type { Game, Achievement, Reward, FilterDifficulty } from "@/app/types";
 import { AchievementItem } from "@/components/achievements/achievement-item";
 import { RewardModal } from "@/components/rewards/reward-modal";
 import { AIModal } from "@/components/ai/ai-modal";
-import { mockAIResults } from "@/app/mock-data";
+import type { AIResult } from "@/app/types";
 import {
   createAchievement,
   deleteAchievement,
@@ -84,6 +84,8 @@ export default function GameDetailPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterDifficulty>("all");
   const [aiOpen, setAiOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResults, setAiResults] = useState<AIResult[]>([]);
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
 
   // Create form state
@@ -218,6 +220,60 @@ export default function GameDetailPage() {
   const handleQuestDelete = (id: string) => {
     setAchievements((prev) => prev.filter((a) => a.id !== id));
     setSelectedQuest(null);
+  };
+
+  const handleAiOpen = async () => {
+    setAiOpen(true);
+    setAiLoading(true);
+    setAiResults([]);
+    try {
+      const res = await fetch("/api/generate-achievements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal: game?.title ?? "" }),
+      });
+      const data = await res.json();
+      if (data.achievements && Array.isArray(data.achievements)) {
+        setAiResults(
+          data.achievements.map((a: Record<string, unknown>) => ({
+            title: String(a.title ?? ""),
+            description: String(a.description ?? ""),
+            difficulty: a.difficulty as AIResult["difficulty"],
+            starsRewarded: Number(a.stars_rewarded ?? 5),
+            selected: true,
+          }))
+        );
+      }
+    } catch (e) {
+      console.error("AI generation failed:", e);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAddAiQuests = async (results: AIResult[]) => {
+    const selected = results.filter((r) => r.selected);
+    for (const r of selected) {
+      try {
+        await createAchievement(
+          gameId,
+          r.title,
+          r.difficulty,
+          r.description || undefined,
+          0
+        );
+      } catch (e) {
+        console.error("Failed to add AI quest:", e);
+      }
+    }
+    // Refetch achievements
+    const { data: achRows } = await supabase
+      .from("achievements")
+      .select("*")
+      .eq("game_id", gameId)
+      .order("created_at", { ascending: true });
+    setAchievements((achRows ?? []).map((r: AchievementRow) => achievementFromRow(r)));
+    setAiOpen(false);
   };
 
   if (loading) {
@@ -384,7 +440,7 @@ export default function GameDetailPage() {
               ＋ New Quest
             </button>
             <button
-              onClick={() => setAiOpen(true)}
+              onClick={handleAiOpen}
               className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
             >
               ✦ AI Coach
@@ -557,7 +613,7 @@ export default function GameDetailPage() {
           </div>
         )}
 
-        {!showCreateForm && (
+        {!showCreateForm && !aiOpen && (
           <>
             {/* Filter tabs */}
             <div className="flex gap-2 mb-4">
@@ -604,7 +660,9 @@ export default function GameDetailPage() {
         isOpen={aiOpen}
         onClose={() => setAiOpen(false)}
         gameTitle={game.title}
-        results={mockAIResults}
+        results={aiResults}
+        loading={aiLoading}
+        onAddQuests={handleAddAiQuests}
       />
 
       {/* Reward Modal */}

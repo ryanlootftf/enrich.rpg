@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AIResult } from "@/app/types";
 
 const diffConfig: Record<string, { icon: string; label: string }> = {
@@ -14,10 +14,16 @@ interface Props {
   onClose: () => void;
   gameTitle: string;
   results: AIResult[];
+  loading?: boolean;
+  onAddQuests?: (results: AIResult[]) => void;
 }
 
-export function AIModal({ isOpen, onClose, gameTitle, results }: Props) {
+export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQuests }: Props) {
   const [resultsState, setResultsState] = useState<AIResult[]>(results);
+
+  useEffect(() => {
+    setResultsState(results);
+  }, [results]);
 
   if (!isOpen) return null;
 
@@ -63,6 +69,33 @@ export function AIModal({ isOpen, onClose, gameTitle, results }: Props) {
           AI generates quest ideas based on your goal. Toggle to accept the
           challenges you want.
         </p>
+
+        {/* Loading skeleton */}
+        {loading && resultsState.length === 0 && (
+          <div className="px-5 flex flex-col gap-2 overflow-y-auto pb-2">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-bg-3 border border-border-subtle rounded-xl px-[14px] py-3 flex items-center gap-3 animate-pulse"
+              >
+                <div className="w-[22px] h-[22px] rounded-full bg-border-subtle flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-border-subtle rounded w-3/4" />
+                  <div className="h-2 bg-border-subtle rounded w-1/2" />
+                </div>
+                <div className="h-3 bg-border-subtle rounded w-10" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error state */}
+        {!loading && resultsState.length === 0 && (
+          <div className="px-5 py-8 text-center text-text-tertiary text-xs">
+            <p className="mb-1">⚠️ Failed to generate quests.</p>
+            <p>Please check your API key and try again.</p>
+          </div>
+        )}
 
         {/* Results list */}
         <div className="px-5 flex flex-col gap-2 overflow-y-auto pb-2">
@@ -117,7 +150,11 @@ export function AIModal({ isOpen, onClose, gameTitle, results }: Props) {
             selected ·{" "}
             <span className="text-gold font-medium">+{totalStars} ★</span>
           </div>
-          <button className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors">
+          <button
+            onClick={() => onAddQuests?.(resultsState)}
+            disabled={selectedCount === 0}
+            className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             Add to quests
           </button>
         </div>

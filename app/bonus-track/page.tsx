@@ -1,11 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { games } from "@/app/mock-data";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { gameFromRow, type GameRow } from "@/lib/db-helpers";
+import type { Game } from "@/app/types";
 
 export default function BonusTrackPage() {
   const router = useRouter();
-  const bonusGames = games.filter((g) => g.isBonus);
+  const supabase = createClient();
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from("games")
+        .select("*")
+        .eq("is_bonus", true)
+        .order("created_at", { ascending: false });
+      setGames((data ?? []).map((r) => gameFromRow(r as GameRow)));
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
 
   return (
     <div className="space-y-8 pb-16">
@@ -28,14 +46,31 @@ export default function BonusTrackPage() {
 
       <div className="divider-label">Bonus Quests</div>
 
-      {bonusGames.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-bg-2 border border-border-subtle rounded-2xl p-5 animate-pulse"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-10 h-10 rounded-[10px] bg-border-subtle" />
+                <div className="w-16 h-4 rounded-full bg-border-subtle" />
+              </div>
+              <div className="h-4 bg-border-subtle rounded w-3/4 mb-2" />
+              <div className="h-3 bg-border-subtle rounded w-full mb-3" />
+              <div className="h-3 bg-border-subtle rounded w-1/3" />
+            </div>
+          ))}
+        </div>
+      ) : games.length === 0 ? (
         <p className="text-text-tertiary text-xs py-8 text-center">
           No bonus track quests yet. Complete main quests to unlock bonus
           content!
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {bonusGames.map((game) => (
+          {games.map((game) => (
             <div
               key={game.id}
               onClick={() => router.push(`/games/${game.id}`)}
