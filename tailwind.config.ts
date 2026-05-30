@@ -27,8 +27,8 @@ const config: Config = {
         green: "#4ade80",
       },
       fontFamily: {
-        syne: ["Syne", "sans-serif"],
-        "dm-sans": ["DM Sans", "sans-serif"],
+        syne: ["Cinzel", "serif"],
+        "dm-sans": ["Crimson Pro", "serif"],
       },
       borderRadius: {
         "2xl": "16px",
