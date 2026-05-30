@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enrich.rpg — Gamify Your Growth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d10;
+    --bg-card: #141418;
+    --bg-card2: #1a1a20;
+    --border: rgba(255,255,255,0.07);
+    --border-glow: rgba(196,148,84,0.25);
+    --gold: #c49454;
+    --gold-light: #e8c080;
+    --gold-dim: #8a6535;
+    --purple: #9b7fd4;
+    --purple-dim: #6b5494;
+    --orange: #e07040;
+    --green: #4ab884;
+    --text: #f0ece4;
+    --text-muted: #8a8480;
+    --text-dim: #5a5650;
+    --radius: 12px;
+    --radius-lg: 18px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Top rainbow bar */
+  .top-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #9b7fd4, #c49454, #e07040, #4ab884, #5b9bd5, #9b7fd4);
+    background-size: 200% 100%;
+    animation: shimmer 4s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 3rem;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,16,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-family: 'Crimson Pro', serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  .btn-primary {
+    background: var(--gold);
+    color: #1a1000;
+    border: none;
+    padding: 0.55rem 1.4rem;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 0.5px solid var(--border-glow);
+    padding: 0.55rem 1.4rem;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 500px;
+    background: radial-gradient(ellipse at center top, rgba(155,127,212,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    bottom: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 400px;
+    background: radial-gradient(ellipse at center, rgba(196,148,84,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .hero h1 .word-enrich {
+    background: linear-gradient(135deg, var(--purple) 20%, var(--gold) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'Cinzel', serif;
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+  }
+
+  /* SECTION WRAPPER */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    max-width: 540px;
+    margin: 0 auto 4rem;
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 0.5px;
+    background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+    margin: 0;
+  }
+
+  /* FEATURE CARDS */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    position: relative;
+    transition: border-color 0.25s, transform 0.2s;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--purple-dim), var(--gold-dim));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { border-color: var(--border-glow); transform: translateY(-3px); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.3rem;
+  }
+  .icon-purple { background: rgba(155,127,212,0.15); }
+  .icon-gold { background: rgba(196,148,84,0.15); }
+  .icon-orange { background: rgba(224,112,64,0.15); }
+  .icon-green { background: rgba(74,184,132,0.15); }
+
+  .feature-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .feature-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* APP PREVIEW */
+  .preview-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(180deg, var(--bg) 0%, #0f0f14 50%, var(--bg) 100%);
+  }
+  .preview-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .app-mockup {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-top: 3rem;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+    position: relative;
+  }
+
+  .mockup-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 0.5px solid var(--border);
+    background: rgba(10,10,13,0.8);
+  }
+
+  .mockup-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mockup-games-btn {
+    background: rgba(155,127,212,0.15);
+    border: 0.5px solid rgba(155,127,212,0.3);
+    color: var(--purple);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .mockup-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: #1a1000;
+  }
+
+  .mockup-body {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .mockup-section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .quests-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .quest-card {
+    background: var(--bg-card2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quest-card-top-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .bar-orange { background: linear-gradient(90deg, var(--orange), rgba(224,112,64,0)); }
+  .bar-gold { background: linear-gradient(90deg, var(--gold), rgba(196,148,84,0)); }
+
+  .quest-icon-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .quest-icon-box {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(155,127,212,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .quest-pct {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .quest-pct span { color: var(--text); font-weight: 600; }
+
+  .quest-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+  }
+  .quest-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+  .fill-orange { background: var(--orange); width: 19%; }
+  .fill-empty { background: transparent; width: 0%; }
+
+  .quest-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .stars-badge {
+    display: flex; align-items: center; gap: 3px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .status-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+  .status-active { background: rgba(74,184,132,0.15); color: var(--green); border: 0.5px solid rgba(74,184,132,0.3); }
+  .status-empty { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 0.5px solid var(--border); }
+
+  .quest-add-hint {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+  .quest-add-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--purple-dim);
+  }
+
+  .quest-new-card {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px dashed var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    cursor: pointer;
+  }
+  .quest-plus {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(155,127,212,0.15);
+    border: 0.5px solid rgba(155,127,212,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--purple);
+    font-size: 1rem;
+  }
+  .quest-new-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* HOW IT WORKS */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .step-item {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .step-item:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    padding-top: 0.2rem;
+  }
+
+  .step-content {}
+  .step-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--gold-light);
+  }
+  .step-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+
+  /* REWARDS PREVIEW */
+  .rewards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .rewards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .reward-row {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+  .reward-row:hover { border-color: var(--border-glow); }
+
+  .reward-emoji {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-card2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .reward-info { flex: 1; }
+  .reward-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .reward-stars {
+    font-size: 0.75rem;
+    color: var(--gold-dim);
+  }
+
+  .reward-status {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+  .rs-claimed { background: rgba(74,184,132,0.12); color: var(--green); border: 0.5px solid rgba(74,184,132,0.25); }
+  .rs-locked { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 0.5px solid var(--border); }
+
+  .rewards-text { }
+  .rewards-text .section-label { text-align: left; }
+  .rewards-text .section-title { text-align: left; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+  .rewards-text .section-sub { text-align: left; margin: 0 0 2rem; }
+
+  /* TRACK types */
+  .tracks-section {
+    padding: 6rem 2rem;
+    background: var(--bg-card);
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .tracks-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .track-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .track-pill:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+
+  .track-icon {
+    font-size: 1.2rem;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: rgba(196,148,84,0.1);
+    flex-shrink: 0;
+  }
+
+  .track-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .track-sub {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  /* CTA BANNER */
+  .cta-section {
+    padding: 7rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(196,148,84,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section .section-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    margin-bottom: 1rem;
+  }
+
+  .cta-section .section-sub { margin-bottom: 2.5rem; }
+
+  .google-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #fff;
+    color: #2d2d2d;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+  .google-btn:hover { background: #f5f5f5; transform: translateY(-2px); }
+  .google-g {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+  }
+
+  .cta-footnote {
+    margin-top: 1.2rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--purple), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .footer-tagline {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .rewards-grid { grid-template-columns: 1fr; }
+    .quests-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<nav>
+  <div class="nav-logo">Enrich.rpg</div>
+  <ul class="nav-links">
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#rewards">Rewards</a></li>
+    <li><a href="#tracks">Tracks</a></li>
+  </ul>
+  <a href="#cta" class="btn-primary">Begin Quest</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <p class="hero-eyebrow fade-up">Your life. Leveled up.</p>
+  <h1 class="fade-up" style="transition-delay:0.1s">
+    Turn your real life into<br>
+    <span class="word-enrich">an epic quest</span>
+  </h1>
+  <p class="hero-sub fade-up" style="transition-delay:0.2s">
+    Enrich.rpg turns your personal growth into a game — build quests, earn stars, and claim real rewards for becoming the person you want to be.
+  </p>
+  <div class="hero-cta fade-up" style="transition-delay:0.3s">
+    <a href="#cta" class="btn-primary">Start for Free</a>
+    <a href="#how" class="btn-ghost">See How It Works</a>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- APP PREVIEW -->
+<div class="preview-section">
+  <div class="preview-inner">
+    <p class="section-label fade-up">Your dashboard</p>
+    <h2 class="section-title fade-up" style="transition-delay:0.1s">Watch your progress unfold</h2>
+    <p class="section-sub fade-up" style="transition-delay:0.15s">Every quest, every star, every milestone — all in one place.</p>
+
+    <div class="app-mockup fade-up" style="transition-delay:0.2s">
+      <div class="mockup-nav">
+        <div class="mockup-logo">Enrich.rpg</div>
+        <div class="mockup-games-btn">Games</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="mockup-avatar">R</div>
+          <span style="font-size:0.75rem;color:var(--text-muted);">Sign out</span>
+        </div>
+      </div>
+
+      <div class="mockup-body">
+        <p class="mockup-section-label">Active Quests</p>
+        <div class="quests-grid">
+
+          <!-- Social Track -->
+          <div class="quest-card">
+            <div class="quest-card-top-bar bar-orange"></div>
+            <div class="quest-icon-row">
+              <div class="quest-icon-box">🧩</div>
+              <div class="quest-pct">✦ <span>0</span>%</div>
+            </div>
+            <div class="quest-title">Social Track</div>
+            <div class="quest-desc">Quest related to social skills.</div>
+            <div class="progress-track"><div class="progress-fill fill-empty"></div></div>
+            <div class="quest-meta">
+              <div class="quest-add-hint"><div class="quest-add-dot"></div> Add a quest to get started</div>
+              <div class="status-badge status-empty">Empty</div>
+            </div>
+          </div>
+
+          <!-- Health Track -->
+          <div class="quest-card">
+            <div class="quest-card-top-bar bar-gold"></div>
+            <div class="quest-icon-row">
+              <div class="quest-icon-box">💚</div>
+              <div class="quest-pct"><span>19</span>%</div>
+            </div>
+            <div class="quest-title">Health Track</div>
+            <div class="quest-desc">Quest related to personal health.</div>
+            <div class="progress-track"><div class="progress-fill fill-orange"></div></div>
+            <div class="quest-meta">
+              <div class="stars-badge">✦ 6 / 32 stars</div>
+              <div class="status-badge status-active">Active</div>
+            </div>
+          </div>
+
+          <!-- Create New -->
+          <div class="quest-new-card">
+            <div class="quest-plus">+</div>
+            <div class="quest-new-label">Create new game</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <p class="section-label fade-up">The journey</p>
+  <h2 class="section-title fade-up" style="transition-delay:0.05s">How the quest begins</h2>
+  <p class="section-sub fade-up" style="transition-delay:0.1s">Three steps stand between you and the hero you want to become.</p>
+
+  <div class="steps-list">
+    <div class="step-item fade-up">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Choose your track</div>
+        <p class="step-desc">Pick any area of your life you want to level up — Health, Social, Finance, Learning, Creativity. Each becomes its own epic quest line with its own star counter.</p>
+      </div>
+    </div>
+    <div class="step-item fade-up" style="transition-delay:0.08s">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Complete quests, earn stars</div>
+        <p class="step-desc">Every task you complete earns stars. Hit milestones at 1, 10, 25, 50, and 100 stars — and keep earning bonus stars beyond that, every 20 stars forever.</p>
+      </div>
+    </div>
+    <div class="step-item fade-up" style="transition-delay:0.16s">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Claim your real-world rewards</div>
+        <p class="step-desc">You define the rewards. A cheat day at 25 stars. A solo day out at 50. A vanity treat at 10. Real-world incentives that keep you playing the long game.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section>
+  <p class="section-label fade-up">Why it works</p>
+  <h2 class="section-title fade-up" style="transition-delay:0.05s">Built for the long game</h2>
+  <p class="section-sub fade-up" style="transition-delay:0.1s">Designed around the psychology of motivation, not just productivity.</p>
+
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon icon-purple">🎯</div>
+      <div class="feature-title">Quest-based goals</div>
+      <p class="feature-desc">Break your big ambitions into manageable quests. Each one is a step forward, tracked and celebrated.</p>
+    </div>
+    <div class="feature-card fade-up" style="transition-delay:0.06s">
+      <div class="feature-icon icon-gold">⭐</div>
+      <div class="feature-title">Star milestones</div>
+      <p class="feature-desc">A visual progress system that makes the invisible visible. Watch your stars accumulate in real-time.</p>
+    </div>
+    <div class="feature-card fade-up" style="transition-delay:0.12s">
+      <div class="feature-icon icon-orange">🎁</div>
+      <div class="feature-title">Custom rewards you set</div>
+      <p class="feature-desc">You know yourself best. Set rewards that actually motivate you — then earn them, guilt-free.</p>
+    </div>
+    <div class="feature-card fade-up" style="transition-delay:0.18s">
+      <div class="feature-icon icon-green">♾️</div>
+      <div class="feature-title">Infinite bonus track</div>
+      <p class="feature-desc">Past 100 stars? The game doesn't end. Bonus rewards repeat every 20 stars, keeping you engaged forever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRACKS -->
+<div class="tracks-section" id="tracks">
+  <div class="tracks-inner">
+    <p class="section-label fade-up" style="text-align:center">Your arena</p>
+    <h2 class="section-title fade-up" style="transition-delay:0.05s">Every dimension of your life</h2>
+    <p class="section-sub fade-up" style="transition-delay:0.1s">Choose the tracks that matter most. Run multiple quests at once.</p>
+
+    <div class="tracks-grid">
+      <div class="track-pill fade-up">
+        <div class="track-icon">💪</div>
+        <div>
+          <div class="track-name">Health</div>
+          <div class="track-sub">Body & wellness</div>
+        </div>
+      </div>
+      <div class="track-pill fade-up" style="transition-delay:0.05s">
+        <div class="track-icon">🤝</div>
+        <div>
+          <div class="track-name">Social</div>
+          <div class="track-sub">Relationships & skills</div>
+        </div>
+      </div>
+      <div class="track-pill fade-up" style="transition-delay:0.1s">
+        <div class="track-icon">💰</div>
+        <div>
+          <div class="track-name">Finance</div>
+          <div class="track-sub">Money & wealth</div>
+        </div>
+      </div>
+      <div class="track-pill fade-up" style="transition-delay:0.15s">
+        <div class="track-icon">📚</div>
+        <div>
+          <div class="track-name">Learning</div>
+          <div class="track-sub">Skills & knowledge</div>
+        </div>
+      </div>
+      <div class="track-pill fade-up" style="transition-delay:0.2s">
+        <div class="track-icon">🎨</div>
+        <div>
+          <div class="track-name">Creativity</div>
+          <div class="track-sub">Art & expression</div>
+        </div>
+      </div>
+      <div class="track-pill fade-up" style="transition-delay:0.25s">
+        <div class="track-icon">✨</div>
+        <div>
+          <div class="track-name">Custom</div>
+          <div class="track-sub">Your own path</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI QUEST GENERATION -->
+<section id="ai" style="padding: 7rem 2rem;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:1100px;margin:0 auto;">
+
+    <!-- AI Modal Mockup (matches real app) -->
+    <div class="fade-up" style="position:relative;">
+      <div style="background:#1c1c24;border:0.5px solid rgba(255,255,255,0.1);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);max-width:420px;margin:0 auto;">
+
+        <!-- Modal header -->
+        <div style="padding:1.25rem 1.25rem 0.5rem;">
+          <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.2em;color:var(--purple);text-transform:uppercase;margin-bottom:0.35rem;">AI Generate</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:700;color:var(--text);">Deep Focus Mode</div>
+            <div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--text-muted);">✕</div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin:0.6rem 0 1rem;line-height:1.5;font-weight:300;">AI generates quests based on your game's title and description. Toggle to select the ones you want, then confirm to add them. Total stars target: ~100 ★.</p>
+        </div>
+
+        <!-- Quest list -->
+        <div style="padding:0 1rem;display:flex;flex-direction:column;gap:0.5rem;">
+
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="color:#fff;font-size:0.6rem;">✓</span></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'Cinzel',serif;font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px;">Complete 3 Pomodoro Sessions Daily</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Log each 25-minute deep work session with no distra...</div>
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-top:4px;"><span style="font-size:0.65rem;">🌱</span><span style="font-size:0.65rem;color:var(--text-dim);">Easy · 3 steps</span></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gold);font-weight:600;flex-shrink:0;">+1 ★</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="color:#fff;font-size:0.6rem;">✓</span></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'Cinzel',serif;font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px;">No Phone Before 10am — 5 Days</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Keep your phone face-down until after your first work...</div>
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-top:4px;"><span style="font-size:0.65rem;">🌱</span><span style="font-size:0.65rem;color:var(--text-dim);">Easy · 2 steps</span></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gold);font-weight:600;flex-shrink:0;">+2 ★</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="color:#fff;font-size:0.6rem;">✓</span></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'Cinzel',serif;font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px;">Finish One Backlog Task This Week</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Pick a task you've been avoiding and complete it in...</div>
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-top:4px;"><span style="font-size:0.65rem;">⚡</span><span style="font-size:0.65rem;color:var(--orange);">Medium</span><span style="font-size:0.65rem;color:var(--text-dim);">· 4 steps</span></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gold);font-weight:600;flex-shrink:0;">+3 ★</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="color:#fff;font-size:0.6rem;">✓</span></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'Cinzel',serif;font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px;">Block Distracting Sites for 2 Hours</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Use a site blocker during your peak focus window on...</div>
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-top:4px;"><span style="font-size:0.65rem;">⚡</span><span style="font-size:0.65rem;color:var(--orange);">Medium</span><span style="font-size:0.65rem;color:var(--text-dim);">· 3 steps</span></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gold);font-weight:600;flex-shrink:0;">+3 ★</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;opacity:0.5;">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="color:#fff;font-size:0.6rem;">✓</span></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'Cinzel',serif;font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px;">Write a Weekly Progress Journal</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Spend 10 minutes reflecting on what you accomplished...</div>
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-top:4px;"><span style="font-size:0.65rem;">⚡</span><span style="font-size:0.65rem;color:var(--orange);">Medium</span><span style="font-size:0.65rem;color:var(--text-dim);">· 2 steps</span></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gold);font-weight:600;flex-shrink:0;">+2 ★</div>
+          </div>
+
+        </div>
+
+        <!-- Footer bar -->
+        <div style="padding:1rem 1.25rem;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;margin-top:1rem;">
+          <div style="font-size:0.75rem;color:var(--text-muted);">
+            <span style="color:var(--text);font-weight:600;">24 selected</span>
+            &nbsp;·&nbsp;
+            <span style="color:var(--green);font-weight:600;">+98/100 ★</span>
+          </div>
+          <button style="background:var(--purple);border:none;color:#fff;padding:0.5rem 1.25rem;border-radius:8px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:600;letter-spacing:0.03em;cursor:pointer;">Add to quests</button>
+        </div>
+      </div>
+
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:200px;background:radial-gradient(ellipse,rgba(155,127,212,0.07) 0%,transparent 70%);pointer-events:none;z-index:-1;"></div>
+    </div>
+
+    <!-- Text side -->
+    <div class="fade-up" style="transition-delay:0.15s;">
+      <p class="section-label" style="text-align:left;">Powered by AI</p>
+      <h2 class="section-title" style="text-align:left;font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:1rem;">Your game, your quests — generated by AI</h2>
+      <p class="section-sub" style="text-align:left;margin:0 0 1.5rem;font-size:1rem;">Give your game a title and a description — <em>"Health Track: a journey to build better daily habits"</em> — and the AI reads it, understands your intent, and generates a full set of quests that actually match what you're trying to achieve.</p>
+
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:2rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(196,148,84,0.15);border:0.5px solid var(--border-glow);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--gold);flex-shrink:0;margin-top:2px;">✦</div>
+          <p style="font-size:0.9rem;color:var(--text-muted);font-weight:300;margin:0;">Quests are generated from your game's title and description — the more specific you write, the better they get</p>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(196,148,84,0.15);border:0.5px solid var(--border-glow);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--gold);flex-shrink:0;margin-top:2px;">✦</div>
+          <p style="font-size:0.9rem;color:var(--text-muted);font-weight:300;margin:0;">Each quest comes with a difficulty rating and balanced star values targeting ~100 ★</p>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(196,148,84,0.15);border:0.5px solid var(--border-glow);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--gold);flex-shrink:0;margin-top:2px;">✦</div>
+          <p style="font-size:0.9rem;color:var(--text-muted);font-weight:300;margin:0;">Toggle the ones you want, skip the rest, then add them all in one click</p>
+        </div>
+      </div>
+
+      <a href="#cta" class="btn-primary">Try the Quest Forge</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- REWARDS -->
+<section id="rewards" style="padding: 7rem 2rem;">
+  <div class="rewards-grid">
+    <div class="rewards-text">
+      <p class="section-label">The spoils of victory</p>
+      <h2 class="section-title fade-up">Real rewards for real progress</h2>
+      <p class="section-sub fade-up" style="transition-delay:0.1s">Define what victory looks like for you. Then earn it, one star at a time.</p>
+      <a href="#cta" class="btn-primary fade-up" style="transition-delay:0.2s">Set your first reward</a>
+    </div>
+
+    <div class="rewards-list fade-up" style="transition-delay:0.15s">
+      <div class="reward-row">
+        <div class="reward-emoji">☕</div>
+        <div class="reward-info">
+          <div class="reward-name">Fancy Coffee Run</div>
+          <div class="reward-stars">✦ 1 star</div>
+        </div>
+        <div class="reward-status rs-claimed">Claimed</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-emoji">🎧</div>
+        <div class="reward-info">
+          <div class="reward-name">New Playlist Binge</div>
+          <div class="reward-stars">✦ 10 stars</div>
+        </div>
+        <div class="reward-status rs-claimed">Claimed</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-emoji">🍣</div>
+        <div class="reward-info">
+          <div class="reward-name">Omakase Dinner Night</div>
+          <div class="reward-stars">✦ 25 stars</div>
+        </div>
+        <div class="reward-status rs-locked">Locked</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-emoji">✈️</div>
+        <div class="reward-info">
+          <div class="reward-name">Weekend Getaway</div>
+          <div class="reward-stars">✦ 50 stars</div>
+        </div>
+        <div class="reward-status rs-locked">Locked</div>
+      </div>
+      <div class="reward-row" style="border-style: dashed; opacity: 0.6;">
+        <div class="reward-emoji">🎁</div>
+        <div class="reward-info">
+          <div class="reward-name">Set 100 ★ reward...</div>
+          <div class="reward-stars">✦ 100 stars — final reward</div>
+        </div>
+        <div class="reward-status rs-locked">Set</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<div class="cta-section" id="cta">
+  <div class="cta-glow"></div>
+  <p class="section-label fade-up">Your epic quest begins here</p>
+  <h2 class="section-title fade-up" style="transition-delay:0.08s">Ready to level up your life?</h2>
+  <p class="section-sub fade-up" style="transition-delay:0.14s">Join adventurers who are turning everyday habits into legendary progress.</p>
+  <div class="fade-up" style="transition-delay:0.2s;">
+    <a href="#" class="google-btn">
+      <svg class="google-g" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </a>
+    <p class="cta-footnote">Free to start. No credit card required.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Enrich.rpg</div>
+  <div class="footer-tagline">Gamify your growth.</div>
+  <div style="font-size:0.75rem;color:var(--text-dim);">© 2026 Enrich.rpg</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
