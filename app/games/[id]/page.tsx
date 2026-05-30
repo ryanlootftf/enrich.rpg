@@ -716,13 +716,15 @@ export default function GameDetailPage() {
                     : "No quests for this filter."}
                 </p>
               ) : (
-                filteredAchievements.map((ach) => (
-                  <AchievementItem
-                    key={ach.id}
-                    achievement={ach}
-                    onClick={handleQuestClick}
-                  />
-                ))
+                [...filteredAchievements]
+                  .sort((a, b) => Number(a.completed) - Number(b.completed))
+                  .map((ach) => (
+                    <AchievementItem
+                      key={ach.id}
+                      achievement={ach}
+                      onClick={handleQuestClick}
+                    />
+                  ))
               )}
             </div>
           </>
