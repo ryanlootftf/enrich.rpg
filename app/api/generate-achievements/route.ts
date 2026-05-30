@@ -24,14 +24,14 @@ export async function POST(req: Request) {
       .join("\n");
 
     console.log("[AI Gen] Sending prompt to NVIDIA NIM", {
-      model: "minimaxai/minimax-m2.7",
+      model: "stepfun-ai/step-3.7-flash",
       promptLength: prompt.length,
     });
 
     const t0 = Date.now();
 
     const completion = await nim.chat.completions.create({
-      model: "minimaxai/minimax-m2.7",
+      model: "stepfun-ai/step-3.7-flash",
       messages: [
         {
           role: "system",
@@ -69,7 +69,7 @@ Make descriptions specific, actionable, and encouraging. They should give the us
       ],
       temperature: 1,
       top_p: 0.95,
-      max_tokens: 8192,
+      max_tokens: 16384,
     });
 
     const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
