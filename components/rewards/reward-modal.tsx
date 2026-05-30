@@ -38,7 +38,7 @@ export function RewardModal({
         {/* Header */}
         <div className="px-6 pt-5 pb-3 flex items-center justify-between flex-shrink-0">
           <div>
-            <span className="text-gold text-[11px] font-syne uppercase tracking-[0.18em]">
+            <span className="text-gold text-xs font-syne uppercase tracking-[0.18em]">
               Rewards
             </span>
             <h2 className="text-text-primary text-lg font-syne font-semibold mt-0.5">

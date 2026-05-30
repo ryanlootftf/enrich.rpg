@@ -82,7 +82,7 @@ export default function BonusTrackPage() {
                 <div className="w-10 h-10 rounded-[10px] bg-gold/10 flex items-center justify-center text-lg">
                   ✦
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-gold/10 text-gold-2">
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gold/10 text-gold-2">
                   Bonus Track
                 </span>
               </div>
@@ -95,7 +95,7 @@ export default function BonusTrackPage() {
               </div>
 
               <div className="text-xs text-text-secondary flex items-center gap-1">
-                <span className="text-gold text-[10px]">★</span>
+                <span className="text-gold text-xs">★</span>
                 {game.lifetimeStars} / {game.totalPossibleStars} stars
               </div>
             </div>

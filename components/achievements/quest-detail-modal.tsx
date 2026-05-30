@@ -249,7 +249,7 @@ export function QuestDetailModal({
           {!editing && (
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${pill.container}`}>
               <span className={`w-2 h-2 rounded-full ${pill.dot}`} />
-              <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${pill.text}`}>
+              <span className={`text-xs font-semibold uppercase tracking-[0.06em] ${pill.text}`}>
                 {achievement.difficulty}
               </span>
             </div>
@@ -259,7 +259,7 @@ export function QuestDetailModal({
           <div>
             {editing ? (
               <>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-text-secondary mb-1.5">
                   Quest title
                 </span>
                 <input
@@ -271,13 +271,13 @@ export function QuestDetailModal({
                   maxLength={60}
                   className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors"
                 />
-                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                <span className="block text-right text-xs text-text-tertiary mt-0.5">
                   {editTitle.length}/60
                 </span>
               </>
             ) : (
               <div
-                className={`text-[15px] font-syne font-semibold ${
+                className={`text-base font-syne font-semibold ${
                   done ? "text-text-tertiary line-through" : "text-text-primary"
                 }`}
               >
@@ -289,7 +289,7 @@ export function QuestDetailModal({
           {/* Difficulty edit buttons (only in edit mode) */}
           {editing && (
             <div>
-              <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+              <span className="block text-xs font-medium text-text-secondary mb-1.5">
                 Difficulty
               </span>
               <div className="flex gap-2">
@@ -298,7 +298,7 @@ export function QuestDetailModal({
                     key={value}
                     type="button"
                     onClick={() => setEditDifficulty(value)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                       editDifficulty === value
                         ? "border-accent bg-accent/10 text-accent-2"
                         : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
@@ -316,7 +316,7 @@ export function QuestDetailModal({
           <div>
             {editing ? (
               <>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-text-secondary mb-1.5">
                   Description
                 </span>
                 <textarea
@@ -332,13 +332,13 @@ export function QuestDetailModal({
                   rows={2}
                   className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none min-h-[80px]"
                 />
-                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                <span className="block text-right text-xs text-text-tertiary mt-0.5">
                   {editDescription.length}/200
                 </span>
               </>
             ) : (
               <>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1">
+                <span className="block text-xs font-medium text-text-secondary mb-1">
                   Description
                 </span>
                 <p className="text-sm text-text-secondary leading-relaxed">
@@ -352,7 +352,7 @@ export function QuestDetailModal({
 
           {/* Reward section */}
           <div>
-            <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+            <span className="block text-xs font-medium text-text-secondary mb-1.5">
               Reward
             </span>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/30 bg-gold/10 text-gold-2 text-xs font-semibold">
@@ -363,7 +363,7 @@ export function QuestDetailModal({
           {/* Progress section (steps indicator) */}
           {hasProgress && (
             <div className="bg-bg-3/50 border border-border-subtle/50 rounded-xl p-4 space-y-3">
-              <span className="block text-[11px] font-medium text-text-secondary uppercase tracking-wider">
+              <span className="block text-xs font-medium text-text-secondary uppercase tracking-wider">
                 Progress
               </span>
 
@@ -403,7 +403,7 @@ export function QuestDetailModal({
               {/* Steps target edit */}
               {editing && (
                 <div>
-                  <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                  <span className="block text-xs font-medium text-text-secondary mb-1.5">
                     Steps target
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -424,7 +424,7 @@ export function QuestDetailModal({
                     >
                       +
                     </button>
-                    <span className="text-text-tertiary text-[10px]">steps</span>
+                    <span className="text-text-tertiary text-xs">steps</span>
                   </div>
                   <div className="flex gap-1.5 mt-2">
                     {[1, 3, 5, 10].map((n) => (
@@ -432,7 +432,7 @@ export function QuestDetailModal({
                         key={n}
                         type="button"
                         onClick={() => setEditProgressMax(n)}
-                        className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors ${
+                        className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                           editProgressMax === n
                             ? "border-accent bg-accent/10 text-accent-2"
                             : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"

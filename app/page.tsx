@@ -27,7 +27,7 @@ export default function LandingPage() {
             <h1 className="font-syne text-3xl font-extrabold tracking-tight gradient-text">
               Enrich.rpg
             </h1>
-            <p className="text-text-tertiary text-xs uppercase tracking-[0.2em] font-dm-sans">
+            <p className="text-text-tertiary text-xs uppercase tracking-[0.2em] font-crimson-pro">
               Gamify Your Growth
             </p>
           </div>
@@ -35,7 +35,7 @@ export default function LandingPage() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-border-subtle" />
-            <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+            <span className="text-text-tertiary text-xs uppercase tracking-[0.12em]">
               Sign in
             </span>
             <div className="flex-1 h-px bg-border-subtle" />
@@ -44,7 +44,7 @@ export default function LandingPage() {
           {/* Google button */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-dm-sans text-sm font-medium px-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(124,106,255,0.15)]"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-crimson-pro text-sm font-medium px-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(124,106,255,0.15)]"
           >
             <svg
               className="w-5 h-5"
@@ -72,7 +72,7 @@ export default function LandingPage() {
           </button>
 
           {/* Bottom text */}
-          <p className="text-text-tertiary text-[10px] tracking-[0.08em]">
+          <p className="text-text-tertiary text-xs tracking-[0.08em]">
             Your epic quest begins here
           </p>
         </div>

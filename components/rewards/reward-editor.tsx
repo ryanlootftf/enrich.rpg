@@ -26,9 +26,9 @@ export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, l
 
       {/* Main Track */}
       <div className="space-y-3">
-        <p className="text-[11px] font-medium text-text-secondary uppercase tracking-wider">
-          Main Track
-        </p>
+          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+            Main Track
+          </p>
         <div className="flex flex-col gap-2.5">
           {MAIN_MILESTONES.map((stars) => {
             const existing = mainRewards.find((r) => r.requiredStars === stars);
@@ -51,7 +51,7 @@ export function RewardEditor({ game, mainRewards, bonusRewards, bonusTemplate, l
       {/* Bonus Track */}
       <div className="space-y-3">
         <div className="divider-label">Bonus Track Rewards</div>
-        <p className="text-[11px] text-text-tertiary">
+        <p className="text-xs text-text-tertiary">
           Set one reward — it repeats every {BONUS_INTERVAL} ★ after 100 ★
         </p>
         <MilestoneSlot
@@ -175,12 +175,12 @@ function MilestoneSlot({
     return (
       <div className={`${bgClass} ${borderClass} border rounded-xl p-4 space-y-3`}>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-medium text-text-secondary">{starLabel}</span>
+          <span className="text-xs font-medium text-text-secondary">{starLabel}</span>
         </div>
 
         {/* Emoji picker */}
         <div>
-          <label className="block text-[10px] text-text-tertiary mb-1">Emoji</label>
+          <label className="block text-xs text-text-tertiary mb-1">Emoji</label>
           <div className="flex flex-wrap gap-1.5 mb-2">
             {EMOJI_PALETTE.map((e) => (
               <button
@@ -201,7 +201,7 @@ function MilestoneSlot({
 
         {/* Title input */}
         <div>
-          <label className="block text-[10px] text-text-tertiary mb-1">Reward name</label>
+          <label className="block text-xs text-text-tertiary mb-1">Reward name</label>
           <input
             type="text"
             value={title}
@@ -264,7 +264,7 @@ function MilestoneSlot({
         <div className="text-sm font-semibold text-text-primary truncate">
           {title || (isTemplate ? "Set bonus reward…" : `Set ${requiredStars} ★ reward…`)}
         </div>
-        <div className="text-[11px] text-zinc-500 mt-0">
+        <div className="text-xs text-zinc-500 mt-0">
           {starLabel}
           {unlocked && !claimed && !isTemplate && (
             <span className="text-accent-2 ml-1">— available</span>
@@ -277,7 +277,7 @@ function MilestoneSlot({
         {unlocked && !claimed && !isTemplate && (
           <button
             onClick={handleClaim}
-            className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors px-2 py-1"
+          className="text-xs font-medium text-accent-2 hover:text-accent transition-colors px-2 py-1"
           >
             Claim
           </button>
@@ -285,14 +285,14 @@ function MilestoneSlot({
         {claimed && !isTemplate && (
           <button
             onClick={handleUnclaim}
-            className="text-[11px] font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
+            className="text-xs font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
           >
             Unclaim
           </button>
         )}
         <button
           onClick={() => setEditing(true)}
-          className="text-[11px] font-medium text-text-tertiary hover:text-text-secondary transition-colors px-2 py-1"
+          className="text-xs font-medium text-text-tertiary hover:text-text-secondary transition-colors px-2 py-1"
         >
           {existingReward ? "Edit" : "Set"}
         </button>
@@ -300,7 +300,7 @@ function MilestoneSlot({
 
       {/* Status badge */}
       <span
-        className={`text-[11px] px-[10px] py-0.5 rounded-full font-medium flex-shrink-0 ${statusClass}`}
+        className={`text-xs px-[10px] py-0.5 rounded-full font-medium flex-shrink-0 ${statusClass}`}
       >
         {statusLabel}
       </span>
@@ -341,26 +341,26 @@ function ClaimableBonusCard({ reward, gameId, onRewardsChanged }: { reward: Rewa
       </div>
       <div className="flex-1">
         <div className="text-sm font-semibold text-text-primary">{reward.title}</div>
-        <div className="text-[11px] text-zinc-500 mt-0">at {reward.requiredStars} ★ — bonus reward</div>
+        <div className="text-xs text-zinc-500 mt-0">at {reward.requiredStars} ★ — bonus reward</div>
       </div>
       <div className="flex items-center gap-1.5">
         {!claimed ? (
           <button
             onClick={handleClaim}
-            className="text-[11px] font-medium text-gold-2 hover:text-gold transition-colors px-2 py-1"
+          className="text-xs font-medium text-gold-2 hover:text-gold transition-colors px-2 py-1"
           >
             Claim
           </button>
         ) : (
           <button
             onClick={handleUnclaim}
-            className="text-[11px] font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
+          className="text-xs font-medium text-orange-400 hover:text-orange-300 transition-colors px-2 py-1"
           >
             Unclaim
           </button>
         )}
         {claimed && (
-          <span className="text-[11px] px-[10px] py-0.5 rounded-full font-medium bg-green/10 text-green">
+          <span className="text-xs px-[10px] py-0.5 rounded-full font-medium bg-green/10 text-green">
             Claimed
           </span>
         )}

@@ -53,14 +53,14 @@ export function GameCard({ game }: { game: Game }) {
             {themeIcons[game.theme]}
           </div>
           {isEmpty ? (
-            <div className="font-syne text-[11px] font-semibold text-text-tertiary flex items-center gap-1 pt-1">
+            <div className="font-syne text-xs font-semibold text-text-tertiary flex items-center gap-1 pt-1">
               <span>✨</span> 0%
             </div>
           ) : (
-            <div className="font-syne text-[22px] font-bold text-text-primary">
+            <div className="font-syne text-[24px] font-bold text-text-primary">
               {displayPct}
               {!game.isBonus && (
-                <span className="text-xs text-text-tertiary font-normal font-dm-sans">
+                <span className="text-xs text-text-tertiary font-normal font-crimson-pro">
                   %
                 </span>
               )}
@@ -72,7 +72,7 @@ export function GameCard({ game }: { game: Game }) {
         <div className="font-syne text-sm font-semibold text-text-primary mb-1">
           {game.title}
         </div>
-        <div className="text-xs text-text-tertiary mb-[14px]">
+        <div className="text-xs text-text-tertiary mb-4">
           {game.description}
         </div>
 
@@ -90,21 +90,21 @@ export function GameCard({ game }: { game: Game }) {
         <div className="flex items-center justify-between mt-[10px]">
           {isEmpty ? (
             <div className="text-xs text-text-tertiary flex items-center gap-1">
-              <span className="text-[10px]">📋</span>
+              <span className="text-xs">📋</span>
               Add a quest to get started
             </div>
           ) : (
             <div className="text-xs text-text-secondary flex items-center gap-1">
-              <span className="text-gold text-[10px]">★</span>
+              <span className="text-gold text-xs">★</span>
               {game.lifetimeStars} / {game.totalPossibleStars} stars
             </div>
           )}
           {game.isBonus ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-gold/10 text-gold-2">
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gold/10 text-gold-2">
               Bonus Track ✦
             </span>
           ) : (
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               isEmpty ? "bg-text-tertiary/10 text-text-tertiary" : "bg-green/10 text-green"
             }`}>
               {isEmpty ? "Empty" : "Active"}

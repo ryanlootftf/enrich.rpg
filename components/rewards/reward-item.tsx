@@ -63,7 +63,7 @@ export function RewardItem({ reward }: Props) {
         <div className="text-sm font-semibold text-text-primary">
           {reward.title}
         </div>
-        <div className="text-[11px] text-zinc-500 mt-0">
+        <div className="text-xs text-zinc-500 mt-0">
           {reward.type === "BONUS_TRACK"
             ? "Bonus reward — every 25 stars"
             : `at ${reward.requiredStars} stars${
@@ -73,7 +73,7 @@ export function RewardItem({ reward }: Props) {
       </div>
 
       <span
-        className={`text-[11px] px-[10px] py-0.5 rounded-full font-medium ${statusClass}`}
+        className={`text-xs px-[10px] py-0.5 rounded-full font-medium ${statusClass}`}
       >
         {statusLabel}
       </span>

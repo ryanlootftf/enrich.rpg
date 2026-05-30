@@ -73,7 +73,7 @@ export function AchievementItem({ achievement, onClick }: Props) {
 
         {/* Description */}
         {achievement.description && (
-          <p className="text-[11px] text-zinc-500 mt-0 leading-snug truncate">
+          <p className="text-xs text-zinc-500 mt-0 leading-snug truncate">
             {achievement.description}
           </p>
         )}
@@ -87,12 +87,12 @@ export function AchievementItem({ achievement, onClick }: Props) {
                 style={{ width: `${progressPct}%` }}
               />
             </div>
-            <span className="text-[10px] font-medium text-text-tertiary flex-shrink-0 leading-none">
+            <span className="text-xs font-medium text-text-tertiary flex-shrink-0 leading-none">
               {achievement.progressCurrent}/{achievement.progressMax}
             </span>
             {/* Difficulty pill — inline with progress row */}
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text} flex-shrink-0`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text} flex-shrink-0`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${pill.dot}`} />
               {achievement.difficulty}
@@ -104,7 +104,7 @@ export function AchievementItem({ achievement, onClick }: Props) {
         {(!hasProgress || done) && (
           <div className="mt-2">
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text}`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-[0.06em] ${pill.bg} ${pill.border} ${pill.text}`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${pill.dot}`} />
               {achievement.difficulty}

@@ -404,7 +404,7 @@ export default function GameDetailPage() {
             title="Delete game"
           >
             {deletingGame ? (
-              <span className="text-[10px] animate-pulse">…</span>
+              <span className="text-xs animate-pulse">…</span>
             ) : (
               <svg
                 width="15"
@@ -444,7 +444,7 @@ export default function GameDetailPage() {
             {/* Stats row */}
             <div className="flex gap-6 flex-wrap">
               <div>
-                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                <span className="text-text-tertiary text-xs uppercase tracking-[0.12em]">
                   Stars
                 </span>
                 <div className="text-lg font-syne font-bold text-text-primary">
@@ -455,7 +455,7 @@ export default function GameDetailPage() {
                 </div>
               </div>
               <div>
-                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                <span className="text-text-tertiary text-xs uppercase tracking-[0.12em]">
                   Completed
                 </span>
                 <div className="text-lg font-syne font-bold text-text-primary">
@@ -466,7 +466,7 @@ export default function GameDetailPage() {
                 </div>
               </div>
               <div>
-                <span className="text-text-tertiary text-[10px] uppercase tracking-[0.12em]">
+                <span className="text-text-tertiary text-xs uppercase tracking-[0.12em]">
                   Progress
                 </span>
                 <div className="text-lg font-syne font-bold text-text-primary">
@@ -493,7 +493,7 @@ export default function GameDetailPage() {
             {/* Set Rewards button */}
             <button
               onClick={() => setRewardModalOpen(true)}
-              className="mt-5 text-[11px] font-medium text-gold hover:text-gold-2 transition-colors flex items-center gap-1"
+              className="mt-5 text-xs font-medium text-gold hover:text-gold-2 transition-colors flex items-center gap-1"
             >
               🎁 Set Rewards
             </button>
@@ -511,13 +511,13 @@ export default function GameDetailPage() {
                 setShowCreateForm(true);
                 setAiOpen(false);
               }}
-              className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
+              className="text-xs font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
             >
               ＋ New Quest
             </button>
             <button
               onClick={handleAiOpen}
-              className="text-[11px] font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
+              className="text-xs font-medium text-accent-2 hover:text-accent transition-colors flex items-center gap-1"
             >
               ✦ AI Generate
             </button>
@@ -531,7 +531,7 @@ export default function GameDetailPage() {
             <div className="space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label className="block text-xs font-medium text-text-secondary mb-1">
                   Quest title
                 </label>
                 <input
@@ -547,14 +547,14 @@ export default function GameDetailPage() {
                     if (e.key === "Escape") setShowCreateForm(false);
                   }}
                 />
-                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                <span className="block text-right text-xs text-text-tertiary mt-0.5">
                   {newTitle.length}/60
                 </span>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label className="block text-xs font-medium text-text-secondary mb-1">
                   Description
                 </label>
                 <textarea
@@ -570,7 +570,7 @@ export default function GameDetailPage() {
                   rows={2}
                   className="w-full bg-transparent border-b border-border-subtle px-0 py-2 text-sm text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent transition-colors resize-none min-h-[80px]"
                 />
-                <span className="block text-right text-[10px] text-text-tertiary mt-0.5">
+                <span className="block text-right text-xs text-text-tertiary mt-0.5">
                   {newDescription.length}/200
                 </span>
               </div>
@@ -578,13 +578,13 @@ export default function GameDetailPage() {
 
             {/* ── Quest settings card ── */}
             <div className="bg-bg-3/50 border border-border-subtle/50 rounded-xl p-4 space-y-4">
-              <span className="block text-[11px] font-medium text-text-secondary uppercase tracking-wider">
+              <span className="block text-xs font-medium text-text-secondary uppercase tracking-wider">
                 Quest settings
               </span>
 
               {/* Difficulty toggles */}
               <div>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-text-secondary mb-1.5">
                   Difficulty
                 </span>
                 <div className="flex gap-2">
@@ -599,7 +599,7 @@ export default function GameDetailPage() {
                       key={value}
                       type="button"
                       onClick={() => setNewDifficulty(value as Difficulty)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                         newDifficulty === value
                           ? "border-accent bg-accent/10 text-accent-2"
                           : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
@@ -614,7 +614,7 @@ export default function GameDetailPage() {
 
               {/* Steps counter */}
               <div>
-                <span className="block text-[11px] font-medium text-text-secondary mb-1.5">
+                <span className="block text-xs font-medium text-text-secondary mb-1.5">
                   Steps
                 </span>
                 <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-2">
@@ -639,7 +639,7 @@ export default function GameDetailPage() {
                   >
                     +
                   </button>
-                  <span className="text-text-tertiary text-[10px]">steps</span>
+                  <span className="text-text-tertiary text-xs">steps</span>
                 </div>
                 {/* Progress bar */}
                 <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden mb-2">
@@ -657,7 +657,7 @@ export default function GameDetailPage() {
                       key={n}
                       type="button"
                       onClick={() => setNewProgressMax(n)}
-                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors ${
+                      className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                         newProgressMax === n
                           ? "border-accent bg-accent/10 text-accent-2"
                           : "border-border-subtle bg-transparent text-text-tertiary hover:text-text-secondary hover:border-border-default"
@@ -697,7 +697,7 @@ export default function GameDetailPage() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`text-[11px] px-3 py-1 rounded-full font-medium capitalize transition-colors ${
+                  className={`text-xs px-3 py-1 rounded-full font-medium capitalize transition-colors ${
                     filter === f
                       ? "bg-accent/15 text-accent-2"
                       : "bg-bg-2 border border-border-subtle text-text-tertiary hover:text-text-secondary"

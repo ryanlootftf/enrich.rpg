@@ -28,7 +28,16 @@ const config: Config = {
       },
       fontFamily: {
         syne: ["Cinzel", "serif"],
-        "dm-sans": ["Crimson Pro", "serif"],
+        "crimson-pro": ["Crimson Pro", "serif"],
+      },
+      fontSize: {
+        xs: ["13px", { lineHeight: "1.25rem" }],
+        sm: ["15px", { lineHeight: "1.375rem" }],
+        base: ["17px", { lineHeight: "1.625rem" }],
+        lg: ["19px", { lineHeight: "1.75rem" }],
+        xl: ["21px", { lineHeight: "1.75rem" }],
+        "2xl": ["25px", { lineHeight: "2rem" }],
+        "3xl": ["31px", { lineHeight: "2.25rem" }],
       },
       borderRadius: {
         "2xl": "16px",

@@ -42,7 +42,7 @@ export function NewGameCard() {
         <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center text-xl text-accent-2">
           +
         </div>
-        <span className="text-[13px] text-text-tertiary">Create new game</span>
+        <span className="text-xs text-text-tertiary">Create new game</span>
       </div>
 
       {/* Modal overlay */}
@@ -62,7 +62,7 @@ export function NewGameCard() {
               <div>
                 <label
                   htmlFor="title"
-                  className="block text-[11px] uppercase tracking-[0.12em] text-text-tertiary mb-1.5"
+                  className="block text-xs uppercase tracking-[0.12em] text-text-tertiary mb-1.5"
                 >
                   Title *
                 </label>
@@ -82,7 +82,7 @@ export function NewGameCard() {
               <div>
                 <label
                   htmlFor="description"
-                  className="block text-[11px] uppercase tracking-[0.12em] text-text-tertiary mb-1.5"
+                  className="block text-xs uppercase tracking-[0.12em] text-text-tertiary mb-1.5"
                 >
                   Description
                 </label>

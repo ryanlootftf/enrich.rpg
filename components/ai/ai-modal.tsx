@@ -66,7 +66,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
         {/* Header */}
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <div>
-            <span className="text-accent-2 text-[11px] font-syne uppercase tracking-[0.18em]">
+            <span className="text-accent-2 text-xs font-syne uppercase tracking-[0.18em]">
               AI Generate
             </span>
             <h2 className="text-bg? text-text-primary text-lg font-syne font-semibold mt-0.5">
@@ -93,13 +93,13 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
             <div className="bg-bg-3 border border-border-subtle rounded-xl px-4 py-3 flex items-center gap-3">
               <span className="text-lg animate-spin">🧙</span>
               <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-medium text-text-primary">
+                <div className="text-sm font-medium text-text-primary">
                   Generating quests
                   <span className="inline-block w-[3ch] text-left animate-pulse">
                     ...
                   </span>
                 </div>
-                <div className="text-[11px] text-text-tertiary">
+                <div className="text-xs text-text-tertiary">
                   AI is crafting quests for your game
                 </div>
               </div>
@@ -146,7 +146,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
               }`}
             >
               <div
-                className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center flex-shrink-0 text-[11px] ${
+                className={`w-[22px] h-[22px] rounded-full border-[1.5px] flex items-center justify-center flex-shrink-0 text-xs ${
                   result.selected
                     ? "bg-accent border-accent text-white"
                     : "border-border-default"
@@ -156,21 +156,21 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
               </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-medium text-text-primary">
+                    <div className="text-sm font-medium text-text-primary">
                       {result.title}
                     </div>
                   {result.description && (
-                      <div className="text-[11px] text-text-tertiary mt-0.5 leading-snug truncate">
+                      <div className="text-xs text-text-tertiary mt-0.5 leading-snug truncate">
                         {result.description}
                       </div>
                     )}
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[11px] text-text-tertiary inline-flex items-center gap-1">
+                      <span className="text-xs text-text-tertiary inline-flex items-center gap-1">
                         {diffConfig[result.difficulty]?.icon}{" "}
                         {diffConfig[result.difficulty]?.label}
                       </span>
                       {result.progressMax > 1 && (
-                        <span className="text-[11px] text-text-tertiary">
+                        <span className="text-xs text-text-tertiary">
                           {result.progressMax} steps
                         </span>
                       )}
@@ -192,7 +192,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
             </div>
             <button
               onClick={onClose}
-              className="text-[13px] font-medium px-5 py-2 rounded-lg border border-border-default text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors"
+              className="text-sm font-medium px-5 py-2 rounded-lg border border-border-default text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors"
             >
               Cancel
             </button>
@@ -201,7 +201,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
           /* Footer — results state */
           <div className="border-t border-border-subtle">
             {addError && (
-              <div className="text-[11px] text-coral px-5 pt-3">
+              <div className="text-xs text-coral px-5 pt-3">
                 {addError}
               </div>
             )}
@@ -229,7 +229,7 @@ export function AIModal({ isOpen, onClose, gameTitle, results, loading, onAddQue
                 }
               }}
               disabled={selectedCount === 0 || adding}
-              className="bg-accent text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+              className="bg-accent text-white text-sm font-medium px-5 py-2 rounded-lg hover:bg-accent-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
               {adding && (
                 <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -6,13 +6,13 @@
 
 @layer base {
   body {
-    @apply bg-bg text-text-primary font-dm-sans;
+    @apply bg-bg text-text-primary font-crimson-pro leading-relaxed tracking-[0.01em];
   }
 }
 
 @layer components {
   .section-label {
-    @apply font-syne text-[11px] tracking-[0.18em] uppercase text-text-tertiary mb-3 pl-0.5;
+    @apply font-syne text-xs tracking-[0.18em] uppercase text-text-tertiary mb-3 pl-0.5;
   }
 
   .screen {
@@ -26,7 +26,7 @@
   }
 
   .divider-label {
-    @apply flex items-center gap-3 my-8 text-text-tertiary text-[11px] uppercase tracking-[0.15em];
+    @apply flex items-center gap-3 my-8 text-text-tertiary text-xs uppercase tracking-[0.15em];
   }
   .divider-label::before,
   .divider-label::after {

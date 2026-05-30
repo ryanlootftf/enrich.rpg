@@ -53,7 +53,7 @@ export function NavBar() {
           return (
             <Link key={tab.href} href={tab.href}>
               <span
-                className={`px-[14px] py-1.5 rounded-lg text-[13px] cursor-pointer transition-colors duration-150 ${
+                className={`px-[14px] py-1.5 rounded-lg text-sm cursor-pointer transition-colors duration-150 ${
                   isActive
                     ? "bg-accent/15 text-accent-2 font-medium"
                     : "text-text-secondary hover:text-text-primary"
@@ -75,7 +75,7 @@ export function NavBar() {
         </div>
         <button
           onClick={handleSignOut}
-          className="text-text-tertiary text-[11px] hover:text-text-primary transition-colors"
+          className="text-text-tertiary text-xs hover:text-text-primary transition-colors"
         >
           Sign out
         </button>
